@@ -15,5 +15,5 @@ param T;# transmission gain
 var c {v in S}; #VF computational resources
 var a {n in V}; # set of VFs hosted at node n
 var attachment{r[i], R[i] };
-var P{v in A,n in V}; #VF or VL placement
-var indicator_func {a[n] ,r[i]};
+var P{v in S,n in V}; #VF or VL placement
+#var indicator_func {a[n] ,r[i]};
