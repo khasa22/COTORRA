@@ -25,4 +25,3 @@ maximize resources: sum {n in V} comput_res[n]-
 sum {v in S: v in avf} c[v] + sum {(n1, n2) in E} throughput[n1,n2]-
 sum {(v1,v2) in ES:(v1,v2) in avl} vf_throughput[v1,v2];
 
-subject to 
