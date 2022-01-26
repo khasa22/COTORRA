@@ -1,10 +1,10 @@
-set V; # set of graph nodes
+#set V; # set of graph nodes\
+set N :={1..n}; # graph nodes
 set S; # set of services
 set E:={n1 in N, n2 in N}; # graph edges
 #set A; #set of VFs
 set ES; # service graph edges
 param n;
-set N :={1..n};
 param comput_res {V};
 #PoA
 param R {i in N};
