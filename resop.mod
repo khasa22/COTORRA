@@ -1,6 +1,6 @@
 set V; # set of graph nodes
 set S; # set of services
-set E; # graph edges
+set E:={n1 in N, n2 in N}; # graph edges
 #set A; #set of VFs
 set ES; # service graph edges
 param n;
