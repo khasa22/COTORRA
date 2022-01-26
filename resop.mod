@@ -1,17 +1,18 @@
-#set V; # set of graph nodes\
-set N :={1..n}; # graph nodes
-set S; # set of services
-set E:={n1 in N, n2 in N}; # graph edges
+set N := R union r union w union s; #hardware graph V(G) nodes (i.e. PoA,robot,switches,servers)
+set S; # service graph
+set E:={n1 in N, n2 in N}; # graph edges of hardware graph
 #set A; #set of VFs
-set ES; # service graph edges
+set ES:={v1 in S,v2 in S}; # vertices of service graph
+set R :={1..n};
+set r ;
+set w ;
+set s ;
 param n;
 param comput_res {V};
 #PoA
-param R {i in N};
 param throughput{n1 in E, n2 in E};
 param delay;
-param r {i in N};
-var signal_strength{r[i]};
+param signal_strength{r[i]};
 param sensor_data;
 # transmission gain
 var T{R[i]} ;
