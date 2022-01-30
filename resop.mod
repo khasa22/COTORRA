@@ -46,4 +46,3 @@ sum {v in S: v in avf} c[v] + sum {(n1, n2) in E} throughput[(n1,n2)in E]-
 sum {(v1,v2) in ES:(v1,v2) in avl} vf_throughput[(v1,v2) in ES];
 
 subject to Consrtaint{i in r}: sum {p in R} attachment{i,p}=1;
-subject to PoA_feasiblity{}:
