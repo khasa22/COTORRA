@@ -56,7 +56,7 @@ subject to capacity{(n1,n2) in E}:
 					sum {(v1, v2) in avl} vf_throughput[v1,v2] <=throughput[n1,n2];
 subject to T{i in r, p in R}: 
 					throughput[i,p]*log2 (1+(signal_strength[i,p]/background_noise));
-subject to PoA_feasiblity{i in r, p in j}: 
+subject to PoA_feasiblity{i in r, p in R}: 
 					sum {(v1,v2) in ES} vf_throughput[v1,v2]<= T[i,p];
 subject to delay{j in S}: 
 			sum {v in S} Pdelay[v] + sum {(v1,v2) in ES} Ndelay[v1,v2] <=DS[j];
