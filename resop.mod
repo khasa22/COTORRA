@@ -54,12 +54,12 @@ sum {v in S,n in N} if avf[n,v]==1 then c[v]
 sum {(v1,v2) in ES}if avf[n,v]==1 then vf_throughput[v1,v2];
 
 subject to Consrtaint{i in r}: 
-					sum {p in R} attachment[i,p]=1;
+		sum {p in R} attachment[i,p]=1;
 subject to palcement{n in N}: 
-				    sum {v in S} avf[v,n]*c[v] <= comput_res[n];
+	        sum {v in S} avf[v,n]*c[v] <= comput_res[n];
 subject to capacity{(n1,n2) in E}: 
-					sum {(v1, v2) in ES} vf_throughput[v1,v2] <=throughput[n1,n2];
+		sum {(v1, v2) in ES} vf_throughput[v1,v2] <=throughput[n1,n2];
 subject to PoA_feasiblity{i in r, p in R}: 
-					sum {(v1,v2) in ES} vf_throughput[v1,v2]<= T[i,p];
+		sum {(v1,v2) in ES} vf_throughput[v1,v2]<= T[i,p];
 subject to delay{j in S}: 
-			sum {v in S} Pdelay[v] + sum {(v1,v2) in ES} Ndelay[v1,v2] <=DS[j];
+		sum {v in S} Pdelay[v] + sum {(v1,v2) in ES} Ndelay[v1,v2] <=DS[j];
