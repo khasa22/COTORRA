@@ -12,26 +12,20 @@ param comput_res:=
  srvr2  6
  w1     3
  w2     2;
-param c:  v1  v2:=
-     S1   2    4;
+param c:
+        v1  v2:=
+    S1  2    4;
 param vf_throughput: v1  v2:=
                 S1    2  4;
-param: throughput  d  qd :=
- p1       10       3   0
- p2       10       2   0
- r1       10       4   0
- srvr1    10       6   5
- srvr2    10       8   10
- w1       10       3   0
- w2       10       9   0 ;
-
-param DS:=
- S1   10;
+param: throughput   d  qd :=
+ p1 w1    10        4   5
+ p2 w2    10        8   10
+ srvr1 srvr2  10    12  10;
+param: DS:=
+ S1    10;
 param signal_strength:
                 p1      p2:=
         r1      18      20 ;
 param background_noise:=0;
-param attachment:=
- p1   0   1
- p2   0   1
- r1   0   1;
+param attachment: p1 p2 w1 w2 srvr1 srvr2:=
+              r1   1 1  1   0  0    0    ;
