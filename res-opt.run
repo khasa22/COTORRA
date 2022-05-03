@@ -1,0 +1,5 @@
+reset;
+option solver gurobi;
+model res-opt.mod;
+data res-opt.dat;
+solve;

@@ -1,0 +1,31 @@
+set R:=p1 p2;
+set r:=r1;
+set w:=w1 w2;
+set s:=srvr1 srvr2;
+set S:=S1;
+set VNF:=v1 v2;
+param comput_res:=
+ p1     4
+ p2     5
+ r1     2
+ srvr1  4
+ srvr2  6
+ w1     3
+ w2     2;
+param c:
+        v1  v2:=
+    S1  2    4;
+param vf_throughput: v1  v2:=
+                S1    2  4;
+param: throughput   d  qd :=
+ p1 w1    10        4   5
+ p2 w2    10        8   10
+ srvr1 srvr2  10    12  10;
+param: DS:=
+ S1    10;
+param signal_strength:
+                p1      p2:=
+        r1      18      20 ;
+param background_noise:=0;
+param attachment: p1 p2 w1 w2 srvr1 srvr2:=
+              r1   1 1  1   0  0    0    ;
