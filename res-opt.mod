@@ -22,6 +22,7 @@ param comput_res{n in N};
 #VNF computational resources
 param c { si in S,v in VNF[si]};
 #throughtput between VFs links (v1,v2)
+param vf_throughput{si in S,VL[si]};
 #total bandwidth of (n1,n2)
 param lambda{E};
 #artificial queuing delay
