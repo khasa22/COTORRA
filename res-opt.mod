@@ -42,7 +42,7 @@ param background_noise;
 param T{i in r, p in R}:=lambda[i,p]*(log (1+(signal_strength[i,p]/background_noise)));
 var attachment{r,R} binary;
 #placement variable
-#param P {s1 in S,n in N} binary;
+var P {si in S,VL[si],r,R} binary;
 # set of VFs hosted at node n
 var avf {s1 in S,vf in VNF[s1],n in N} binary;
 #set of VL hosted at node(n1,n2)
@@ -56,8 +56,8 @@ sum{si in S,(n1,n2) in E}
                 sum {(v1,v2) in VL[si]}avl[si, v1,v2, n1,n2]*vf_throughput[si,v1,v2];
 subject to Consrtaint{i in r}:
                             sum {p in R} attachment[i,p]=1;
- subject to {si in S,(v1,v2) in VL[si],ri in r, p in R}:
-                             placement[v1,v2,ri,p]=attachment[ri,p]*avf[si,v1,ri];
+ subject to placement{si in S,(v1,v2) in VL[si],ri in r, p in R}:
+                             P[si,v1,v2,ri,p]=attachment[ri,p]*avf[si,v1,ri];
 subject to capacity{n in N}:
                             sum{si in S} sum {v in VNF[si]} avf[si,v,n]*c[si,v] <= comput_res[n];
 subject to throughput{(n1,n2) in E}:
