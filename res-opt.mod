@@ -62,9 +62,12 @@ subject to Consrtaint{i in r}:
 subject to capacity{n in N}:
                             sum{si in S} sum {v in VNF[si]} avf[si,v,n]*c[si,v] <= comput_res[n];
 subject to throughput{(n1,n2) in E}:
-                            sum{si in S}sum {(v1, v2) in VL[si]} vf_throughput[si, v1,v2] <=lambda[n1,n2];
+                            sum{si in S}sum {(v1, v2) in VL[si]} avl[si,v1,v2,n1,n2]*vf_throughput[si, v1,v2] <=lambda[n1,n2];
 subject to PoA_feasiblity{i in r, p in R}:
                             sum{si in S}sum {(v1,v2) in VL[si]} vf_throughput[si, v1,v2]<= T[i,p];
  subject to delay{j in S,(n1,n2) in E}:
                              (sum {v in VNF[j]} Pdelay[j,v] +
                               sum {(v1,v2) in VL[j]}avl[j,v1,v2,n1,n2]*d[n1,n2]+qd[n1,n2]) <=DS[j];
+#subject to flow{n in w}:
+#                sum{(n1,n) in E}sum{si in S,(v1,v2) in VL[si]}lambda[n1,n]*avl[si,v1,v2,n1,n]=
+#                 sum{(n,n2) in E}sum{si in S,(v1,v2) in VL[si]}lambda[n,n2]*avl[si,v1,v2,n,n2];
