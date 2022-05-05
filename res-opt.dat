@@ -1,31 +1,39 @@
-set R:=p1 p2;
+set R:=R1 R2 R3 R4 R5;
 set r:=r1;
-set w:=w1 w2;
-set s:=srvr1 srvr2;
+set w:=w1 ;
+set s:=cs fe ne;
 set S:=S1;
-set VNF:=v1 v2;
+set VNF[S1]:=v1 v2;
+param mu:=8;
 param comput_res:=
- p1     4
- p2     5
- r1     2
- srvr1  4
- srvr2  6
- w1     3
- w2     2;
+ R1     4
+ R2     4
+ R3     4
+ R4     4
+ R5     4
+ w1     4
+ cs     4
+ fe     4
+ ne     4
+ r      2;
 param c:
         v1  v2:=
     S1  2    4;
-param vf_throughput: v1  v2:=
-                S1    2  4;
-param: throughput   d  qd :=
- p1 w1    10        4   5
- p2 w2    10        8   10
- srvr1 srvr2  10    12  10;
+param vf_throughput:
+                  v1  v2 :=
+            S1    3    4 ;
+param:  d   lambda:=
+ R1 R3  9     3
+ R2 R4  18    9
+ R5 R6  27    12   ;
+ param: qd:=
+ R2 cs  10
+ R5 fe  5  ;
 param: DS:=
- S1    10;
+ S1    15;
 param signal_strength:
-                p1      p2:=
+                R1      R2:=
         r1      18      20 ;
 param background_noise:=0;
-param attachment: p1 p2 w1 w2 srvr1 srvr2:=
-              r1   1 1  1   0  0    0    ;
+param attachment: R1 R2 R3 R4 R5 w1:=
+              r1  1  1  0  0  0  0;
