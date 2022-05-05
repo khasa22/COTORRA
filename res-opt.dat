@@ -4,6 +4,7 @@ set w:=w1 ;
 set s:=cs fe ne;
 set S:=S1;
 set VNF[S1]:=v1 v2;
+set VL[S1]:=(v1,v2);
 param mu:=8;
 param comput_res:=
  R1     4
@@ -15,25 +16,39 @@ param comput_res:=
  cs     4
  fe     4
  ne     4
- r      2;
+ r1     2;
 param c:
         v1  v2:=
     S1  2    4;
-param vf_throughput:
-                  v1  v2 :=
-            S1    3    4 ;
-param:  d   lambda:=
- R1 R3  9     3
- R2 R4  18    9
- R5 R6  27    12   ;
- param: qd:=
- R2 cs  10
- R5 fe  5  ;
+param vf_throughput(tr):
+                    S1:=
+        v1 v2       6  ;
+param: E:  d   lambda  qd :=
+[R1,*] cs  9    10     10
+       fe  4    8      5
+       ne  3    6      0
+       r1  2    4      0
+[R2,*] cs  18   27     10
+       fe  8    12     5
+       ne  9    11     0
+       r1  2    4      0
+[R3,*] cs  9    10     0
+       fe  4    8      0
+       ne  3    6      0
+       r1  2    4      0
+[R4,*] cs  18   27     10
+       fe  8    11     5
+       ne  9    10     0
+       r1  2    4      0
+[R5,*] cs  27   30     0
+       fe  12   15     0
+       ne  9    12     0
+       r1  2    4      0  ;
 param: DS:=
  S1    15;
 param signal_strength:
                 R1      R2:=
         r1      18      20 ;
-param background_noise:=0;
-param attachment: R1 R2 R3 R4 R5 w1:=
-              r1  1  1  0  0  0  0;
+param background_noise:=20;
+var attachment: R1 R2 R3 R4 R5 w1:=
+            r1  0  1  0  1  0  0;
