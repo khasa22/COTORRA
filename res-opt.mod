@@ -10,13 +10,13 @@ set s;
 #hardware graph V(G) nodes (i.e. PoA,robot,switches,servers)
 set N := {R union r union w union s};
 # graph edges of hardware graph
-set E:={n1 in N, n2 in N};
+set E within{n1 in N, n2 in N: n1!=n2};
 # service graph
 set S;
 #set of VNFs
 set VNF{S};
 # Edges (VNFs) of service graph
-set VL{si in S}:={v1 in VNF[si],v2 in VNF[si]};
+set VL{si in S} within{VNF[si],VNF[si]};
 #total computational resources
 param comput_res{n in N};
 #VNF computational resources
