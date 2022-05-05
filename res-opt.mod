@@ -34,7 +34,7 @@ param mu;
 #processing delay of VNFs
 param Pdelay{si in S,vf in VNF[si]}:= sum {(v1,v2)in VL[si]} (1/(vf_throughput[si,v1,v2]-c[si,vf]*mu));
 #network delay of individual links at E(G)
-param Ndelay{(n1,n2) in E}:= sum{si in S} sum {(v1,v2) in VL[si]}d[n1,n2]+qd[n1,n2];
+#param Ndelay{(n1,n2) in E}:= sum{si in S} sum {(v1,v2) in VL[si]}d[n1,n2]+qd[n1,n2];
 #total service delay
 param DS{S};
 param signal_strength{i in r, p in R};
@@ -65,5 +65,6 @@ subject to throughput{(n1,n2) in E}:
                             sum{si in S}sum {(v1, v2) in VL[si]} vf_throughput[si, v1,v2] <=lambda[n1,n2];
 subject to PoA_feasiblity{i in r, p in R}:
                             sum{si in S}sum {(v1,v2) in VL[si]} vf_throughput[si, v1,v2]<= T[i,p];
-subject to delay{j in S}:
-                            sum {v in VNF[j]} Pdelay[j,v] + sum {(v1,v2) in VL[j]} Ndelay[v1,v2] <=DS[j];
+ subject to delay{j in S,(n1,n2) in E}:
+                             (sum {v in VNF[j]} Pdelay[j,v] +
+                              sum {(v1,v2) in VL[j]}avl[j,v1,v2,n1,n2]*d[n1,n2]+qd[n1,n2]) <=DS[j];
