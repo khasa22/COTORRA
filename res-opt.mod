@@ -60,6 +60,13 @@ sum{si in S,(n1,n2) in E}
          
 subject to attach_to_one{i in r}:
         sum {p in R} attachment[i,p]=1;
+
+#VNF should be mapped to at least one server
+subject to vf_mapping{si in S, vf in VNF[si]}:
+         sum{n in N}avf[si,vf,n]>=1;
+
+subject to VL_mapping{si in S,(v1,v2) in VL[si]}:
+        sum{(n1,n2) in E} avl[si,v1,v2,n1,n2]>=1;
         
 # This leads to a quadtratic constraint, below we simplfy it
 # subject to radio_attachment {si in S,(v1,v2) in VL[si],ri in r, p in R}:
@@ -84,5 +91,12 @@ subject to delay{Si in S}:
              (avl[Si,v1,v2,n1,n2]*d[n1,n2]+qd[n1,n2]) <=DS[Si];
              
 subject to flow{n in w union R}:
-         sum{(n1,n) in E}sum{si in S,(v1,v2) in VL[si]}lambda[n1,n]*avl[si,v1,v2,n1,n]=
-         sum{(n,n2) in E}sum{si in S,(v1,v2) in VL[si]}lambda[n,n2]*avl[si,v1,v2,n,n2];
+         sum{(n1,n) in E}sum{si in S,(v1,v2) in VL[si]}vf_throughput[si,v1,v2]*avl[si,v1,v2,n1,n]=
+         sum{(n,n2) in E}sum{si in S,(v1,v2) in VL[si]}vf_throughput[si,v1,v2]*avl[si,v1,v2,n,n2];
+
+
+subject to steer_to_server {si in S, (v1,v2) in VL[si], serv in s}:
+         sum {(n1,serv) in E} avl[si,v1,v2,n1,serv] = avf[si,v2,serv];
+
+subject to steer_from_robot {si in S, (v1,v2) in VL[si], ri in r}:
+        sum {(ri,n2) in E} avl[si,v1,v2,ri,n2] = avf[si,v1,ri];
