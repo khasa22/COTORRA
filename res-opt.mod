@@ -10,18 +10,19 @@ set s;
 #hardware graph V(G) nodes (i.e. PoA,robot,switches,servers)
 set N := {R union r union w union s};
 # graph edges of hardware graph
-set E:={n1 in N, n2 in N};
+set E within{n1 in N, n2 in N: n1!=n2};
 # service graph
 set S;
 #set of VNFs
 set VNF{S};
 # Edges (VNFs) of service graph
-set VL{si in S}:={v1 in VNF[si],v2 in VNF[si]};
+set VL{si in S} within{VNF[si],VNF[si]};
 #total computational resources
 param comput_res{n in N};
 #VNF computational resources
 param c { si in S,v in VNF[si]};
 #throughtput between VFs links (v1,v2)
+param vf_throughput{si in S,VL[si]};
 #total bandwidth of (n1,n2)
 param lambda{E};
 #artificial queuing delay
@@ -33,7 +34,9 @@ param mu;
 #processing delay of VNFs
 param Pdelay{si in S,vf in VNF[si]}:= sum {(v1,v2)in VL[si]} (1/(vf_throughput[si,v1,v2]-c[si,vf]*mu));
 #network delay of individual links at E(G)
-param Ndelay{(n1,n2) in E}:= sum{si in S} sum {(v1,v2) in VL[si]}d[n1,n2]+qd[n1,n2];
+#param Ndelay{(n1,n2) in E}:= sum{si in S} sum {(v1,v2) in VL[si]}d[n1,n2]+qd[n1,n2];
+#param Ndelay{si in S,(n1,n2) in E}:=sum {(v1,v2) in VL[si]}d[n1,n2]+qd[n1,n2];
+#param Ndelay{si in S}:= sum {(v1,v2) in VL[si]}sum {(n1,n2) in E}avl[si,v1,v2,n1,n2]*d[n1,n2]+qd[n1,n2];
 #total service delay
 param DS{S};
 param signal_strength{i in r, p in R};
@@ -61,8 +64,12 @@ subject to Consrtaint{i in r}:
 subject to capacity{n in N}:
                             sum{si in S} sum {v in VNF[si]} avf[si,v,n]*c[si,v] <= comput_res[n];
 subject to throughput{(n1,n2) in E}:
-                            sum{si in S}sum {(v1, v2) in VL[si]} vf_throughput[si, v1,v2] <=lambda[n1,n2];
+                            sum{si in S}sum {(v1, v2) in VL[si]} avl[si,v1,v2,n1,n2]*vf_throughput[si, v1,v2] <=lambda[n1,n2];
 subject to PoA_feasiblity{i in r, p in R}:
                             sum{si in S}sum {(v1,v2) in VL[si]} vf_throughput[si, v1,v2]<= T[i,p];
-subject to delay{j in S}:
-                            sum {v in VNF[j]} Pdelay[j,v] + sum {(v1,v2) in VL[j]} Ndelay[v1,v2] <=DS[j];
+ subject to delay{j in S,(n1,n2) in E}:
+                             (sum {v in VNF[j]} Pdelay[j,v] +
+                              sum {(v1,v2) in VL[j]}avl[j,v1,v2,n1,n2]*d[n1,n2]+qd[n1,n2]) <=DS[j];
+subject to flow{n in w}:
+                sum{(n1,n) in E}sum{si in S,(v1,v2) in VL[si]}lambda[n1,n]*avl[si,v1,v2,n1,n]=
+                sum{(n,n2) in E}sum{si in S,(v1,v2) in VL[si]}lambda[n,n2]*avl[si,v1,v2,n,n2];
