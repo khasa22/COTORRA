@@ -33,10 +33,6 @@ param d{E};
 param mu;
 #processing delay of VNFs
 param Pdelay{si in S,vf in VNF[si]}:= sum {(v1,v2)in VL[si]} (1/(c[si,vf]*mu - vf_throughput[si,v1,v2]));
-#network delay of individual links at E(G)
-#param Ndelay{(n1,n2) in E}:= sum{si in S} sum {(v1,v2) in VL[si]}d[n1,n2]+qd[n1,n2];
-#param Ndelay{si in S,(n1,n2) in E}:=sum {(v1,v2) in VL[si]}d[n1,n2]+qd[n1,n2];
-#param Ndelay{si in S}:= sum {(v1,v2) in VL[si]}sum {(n1,n2) in E}avl[si,v1,v2,n1,n2]*d[n1,n2]+qd[n1,n2];
 #total service delay
 param DS{S};
 param signal_strength{i in r, p in R};
@@ -52,23 +48,36 @@ var avf {s1 in S,vf in VNF[s1],n in N} binary;
 #set of VL hosted at node(n1,n2)
 var avl{si in S, (v1,v2) in VL[si], (n1,n2) in E} binary ;
 #var indicator_func {a[n] ,r[i]};
+# Network delay for a virtual link (v1,v2)
+#param Ndelay{si in S,(n1,n2) in E}:=sum{(v1,v2) in VL[si]}avl[si,v1,v2,n1,n2]*d[n1,n2]+qd[n1,n2];
 
 maximize resources: sum {n in N} comput_res[n]-
 sum {s1 in S,n in N}
-        sum {vf in VNF[s1]} avf[s1,vf,n]*c[s1,vf]
+         sum {vf in VNF[s1]} avf[s1,vf,n]*c[s1,vf]i
 + sum {(n1, n2) in E} lambda[n1,n2]-
 sum{si in S,(n1,n2) in E}
-                sum {(v1,v2) in VL[si]}avl[si, v1,v2, n1,n2]*vf_throughput[si,v1,v2];
- subject to attach_to_one{i in r}:
-                            sum {p in R} attachment[i,p]=1;
- subject to radio_attachment{si in S,(v1,v2) in VL[si],ri in r, p in R}:
-                             avl[si,v1,v2,ri,p] <= attachment[ri,p];
+         sum {(v1,v2) in VL[si]}avl[si, v1,v2, n1,n2]*vf_throughput[si,v1,v2];
+         
+subject to attach_to_one{i in r}:
+        sum {p in R} attachment[i,p]=1;
+        
+# This leads to a quadtratic constraint, below we simplfy it
+# subject to radio_attachment {si in S,(v1,v2) in VL[si],ri in r, p in R}:
+#                           avl[si,v1,v2,ri,p]=attachment[ri,p]*avf[si,v1,ri];
+# We cannot steer (v1,v2) traffic over (ri,p) WiFi link
+# if they (ri,p) are not attached                
+subject to radio_attachment{si in S,(v1,v2) in VL[si],ri in r, p in R}:
+        avl[si,v1,v2,ri,p] <= attachment[ri,p];
+        
 subject to capacity{n in N}:
         sum{si in S} sum {v in VNF[si]} avf[si,v,n]*c[si,v] <= comput_res[n];
+        
 subject to throughput{(n1,n2) in E}:
          sum{si in S}sum {(v1, v2) in VL[si]} avl[si,v1,v2,n1,n2]*vf_throughput[si, v1,v2] <=lambda[n1,n2];
+         
 subject to PoA_feasiblity{i in r, p in R}:
        sum{si in S}sum {(v1,v2) in VL[si]} vf_throughput[si, v1,v2]<= T[i,p];
+       
 subject to delay{Si in S}:
          sum {v in VNF[Si]} Pdelay[Si,v] +
          sum {(v1,v2) in VL[Si]} sum {(n1,n2) in E}
