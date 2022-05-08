@@ -1,4 +1,4 @@
-set R:=R1 R2 R3 R4 R5;
+set R:=R1 R2 R3 R4 R5 R6;
 set r:=r1;
 set w:=w1 ;
 set s:=cs fe ne;
@@ -12,6 +12,7 @@ R2     1
 R3     1
 R4     1
 R5     1
+R6     1
 w1     4
 cs     4
 fe     4
@@ -29,6 +30,7 @@ param vf_throughput(tr):
         R3  2    8      0
         R4  2    8      0
         R5  2    8      0
+        R6  2    8      0
  [R1,*] cs  9    10     0
         fe  4    8      0
          ne  3    6      0
@@ -43,6 +45,9 @@ param vf_throughput(tr):
         ne  9    10     0
  [R5,*] cs  27   30     0
         fe  12   15     0
+        ne  9    12     0 
+ [R6,*] cs  27   30     0
+        fe  12   15     0
         ne  9    12     0  ;
 param: DS:=
  S1    15;
@@ -50,7 +55,7 @@ param signal_strength(tr):
                       r1:=
       R1              9000
       R2              0
-      R3              0
+      R3              7000
       R4              0
       R5              0;
  param background_noise:=20;
