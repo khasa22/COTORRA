@@ -1,4 +1,4 @@
-set R:=R1 R2 R3 R4 R5 R6;
+set R:=R1 R2 R3 R4 R5 R6 R6;
 set r:=r1;
 set w:=w1 ;
 set s:=cs fe ne;
@@ -57,5 +57,6 @@ param signal_strength(tr):
       R2              0
       R3              7000
       R4              0
-      R5              0;
+      R5              0
+      R6              0;
  param background_noise:=20;
