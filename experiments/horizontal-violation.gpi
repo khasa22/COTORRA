@@ -1,0 +1,27 @@
+
+#set title "Test"
+set style line 13 lc rgb 'gray' lt 1 lw 1;
+### #set grid ls 13;
+set grid y2 ls 13;
+set term eps;
+set border lw 3 lc "gray";
+set output "/tmp/hv.eps";
+set key invert reverse Left outside tmargin maxrows 1 center
+set key autotitle columnheader
+
+set style data histogram
+set style histogram rowstacked
+set style fill solid noborder 
+set boxwidth 0.75
+set tics textcolor rgb "black";
+set y2label "e2e delay violation [%]"
+set y2tics rotate by 90 offset 0,-1
+#set xrange [-0.5:0.5]
+set size ratio 2
+set tics scale 0;
+unset xtics
+unset ytics
+
+plot 'violations.txt'  using 2:xtic(1) lc '#275b00' notitle ,\
+    '' using 3 lc '#008fd5'  t 'OKpi_e',\
+    '' using ($4-0.0688889) lc '#e5ae38' t 'SoA';

@@ -1,0 +1,171 @@
+##  # handovers @{48, 100, 315, 363}
+##  # Black regions to illustrate migration
+##  # First region
+##  set object 4 polygon from 0,0 to 0,190 to 45,190 to 45,0 to 0,0;
+##  set object 4 fc "#d2e9f3" fillstyle transparent solid 1 noborder; # rgb "black" lw 1;
+##  # Second region
+##  set object 1 polygon from 51,0 to 51,190 to 97,190 to 97,0 to 51,0;
+##  set object 1 fc "#eaebed" fillstyle transparent solid 1 noborder; #rgb "black" lw 1;
+##  # Third region
+##  set object 3 polygon from 103,0 to 103,190 to 312,190 to 312,0;
+##  set object 3 fc "#ffeec4" fillstyle transparent solid 1 noborder; # rgb "black" lw 1;
+##  # Fourth region
+##  set object 2 polygon from 318,0 to 318,190 to 360,190 to 360,0;
+##  set object 2 fc "#eaebed" fillstyle transparent solid 1 noborder; # rgb "black" lw 1;
+##  # Fifth region
+##  set object 5 polygon from 366,0 to 366,190 to 450,190 to 450,0;
+##  set object 5 fc "#d2e9f3" fillstyle transparent solid 1 noborder; # rgb "black" lw 1;
+##  
+##  
+##  
+
+# Franceso style grid
+set style line 13 lc rgb 'gray' lt 1 lw 1;
+#set grid ls 13;
+set grid y ls 13 front;
+set grid x ls 13 front;
+
+##  set grid front ;
+##  set xlabel "Time [sec]";
+##  set ylabel "Service time [ms]";
+##  set key outside tmargin maxcols 4 maxrows 2 center; 
+##  set yrange [0:190];
+##  set tics scale 0;
+##  set term eps;
+set border lw 3 lc "gray";
+##  set output "/tmp/o.eps";
+set tics textcolor rgb "black";
+
+set term eps;
+set output "/tmp/o.eps";
+
+
+ #####################
+
+ 	
+
+#
+#          Stacked Plot Demo
+#
+# Set top and bottom margins to 0 so that there is no space between plots.
+# Fix left and right margins to make sure that the alignment is perfect.
+# Turn off xtics for all plots except the bottom one.
+# In order to leave room for axis and tic labels underneath, we ask for
+# a 4-plot layout but only use the top 3 slots.
+#
+set key top center samplen 10 width 3 maxrows 2
+#unset xtics
+#unset ytics
+
+set multiplot layout 2,1 
+
+set bmargin 0.2
+set key autotitle column nobox samplen 2 noenhanced
+set key outside
+set key width -5
+unset title
+set tics scale 0 font ",10"
+set xtics format ""
+set yrange [0:40]
+set ylabel "Service time [ms]"
+
+# First region
+set object 1 polygon from 0,52 to 0,190 to 52,190 to 52,0 to 0,0;
+set object 1 fc "#e5f4f8" fillstyle transparent solid 1 noborder; # rgb "black" lw 1;
+# Second region
+set object 2 polygon from 58,0 to 58,190 to 98,190 to 99,0 to 58,0;
+set object 2 fc "#e4f8ee" fillstyle transparent solid 1 noborder; #rgb "black" lw 1;
+# Third region
+set object 3 polygon from 104,0 to 104,190 to 314,190 to 314,0 to 104,0;
+set object 3 fc "#fff1f0" fillstyle transparent solid 1 noborder; #rgb "black" lw 1;
+# Fourth region
+set object 4 polygon from 320,0 to 320,190 to 361,190 to 361,0 to 320,0;
+set object 4 fc "#e4f8ee" fillstyle transparent solid 1 noborder; #rgb "black" lw 1;
+# Fifth region
+set object 5 polygon from 367,0 to 367,190 to 450,190 to 450,0 to 367,0;
+set object 5 fc "#e5f4f8" fillstyle transparent solid 1 noborder; # rgb "black" lw 1;
+
+##############################
+## WITH THEORETICAL ##########
+##############################
+# plot "soa2_p.txt" u 1:2 w lines t "SoA" lc "#16b540" lw 6,\
+#     15 w lines t "target latency" lc "#fc4f30" lw 12 dt 2,\
+#     NaN w lines t "OKpi-e" lc "#008fd5" lw 8,\
+#     NaN w linespoints t "OKpi-t" lc "black" lt 6 ps 1 pt 2 lw 8,\
+#     NaN title "        " with boxes lt 2 fc rgb "#e5f4f8" fillstyle transparent solid 1 border,\
+#     NaN title "        " with boxes lt 2 fc rgb "#e4f8ee" fillstyle transparent solid 1 border,\
+#     NaN title "        " with boxes lt 2 fc rgb "#fff1f0" fillstyle transparent solid 1 border;
+
+##############################
+## WITHOUT THEORETICAL #######
+##############################
+plot "soa2_p.txt" u 1:2 w lines t "SoA" lc "gray40" lw 6,\
+    15 w lines t "target latency" lc "#fc4f30" lw 12 dt 2,\
+    NaN w lines t "OKpi" lc "#008fd5" lw 8,\
+    NaN title "        " with boxes lt 2 fc rgb "#e5f4f8" fillstyle transparent solid 1 border,\
+    NaN title "        " with boxes lt 2 fc rgb "#e4f8ee" fillstyle transparent solid 1 border,\
+    NaN title "        " with boxes lt 2 fc rgb "#fff1f0" fillstyle transparent solid 1 border;
+
+# First region
+set object 1 polygon from 0,52 to 0,190 to 86,190 to 86,0 to 0,0;
+set object 1 fc "#e5f4f8" fillstyle transparent solid 1 noborder; # rgb "black" lw 1;
+# Second region
+set object 2 polygon from 92,0 to 92,190 to 152,190 to 152,0 to 93,0;
+set object 2 fc "#e4f8ee" fillstyle transparent solid 1 noborder; #rgb "black" lw 1;
+# Third region
+set object 3 polygon from 158,0 to 158,190 to 305,190 to 305,0 to 158,0;
+set object 3 fc "#fff1f0" fillstyle transparent solid 1 noborder; #rgb "black" lw 1;
+# Fourth region
+set object 4 polygon from 311,0 to 311,190 to 367,190 to 367,0 to 311,0;
+set object 4 fc "#e4f8ee" fillstyle transparent solid 1 noborder; #rgb "black" lw 1;
+# Fifth region
+set object 5 polygon from 373,0 to 373,190 to 450,190 to 450,0 to 373,0;
+set object 5 fc "#e5f4f8" fillstyle transparent solid 1 noborder; # rgb "black" lw 1;
+
+set xtics format "%.0f"
+set xtics nomirror
+#set ytics (0 "0", 5 "5", 10 "10", 15 "15", 20 "20", 25 "25", 30 "30", 35 "35")
+set tmargin 0.2
+unset bmargin 
+set tics scale 0 
+set xlabel "Time [s]"
+
+##############################
+## WITH THEORETICAL ##########
+##############################
+# plot "okpi_p.txt" u 1:2 w lines lc "#008fd5" lw 8 notitle,\
+#     'theoretical.txt' every 2 u 1:2 w linespoints pi 15 pt 2 lc "black" lt 6 ps 1 lw 8 notitle,\
+#     15 w lines lc "#fc4f30" lw 12 dt 2 notitle;
+
+##############################
+## WITHOUT THEORETICAL #######
+##############################
+plot "okpi_p.txt" u 1:2 w lines lc "#006EAF" lw 8 notitle,\
+    15 w lines lc "#fc4f30" lw 12 dt 2 notitle;
+
+unset multiplot
+
+ #####################
+
+
+
+
+
+
+
+
+
+### plot "soa2_p.txt" u 1:2 w lines t "SoA" lc "#e5ae38" lw 6,\
+###     "okpi_p.txt" u 1:2 w lines t "OKpi_e" lc "#008fd5" lw 8,\
+###     "< awk '(NR%15==0) {print $1,$2;}' 'theoretical.txt'"\
+###         u 1:2 w linespoints t "OKpi_t" lc "#275b00" lt 6 ps 0.7 lw 2,\
+###     15 w lines t "e2e" lc "#fc4f30" lw 5 dt 2,\
+###     NaN title "AP \\{1,3\\}" with boxes lt 2 fc rgb "#d2e9f3" fillstyle transparent solid 1 border,\
+###     NaN title "AP \\{2,4\\}" with boxes lt 2 fc rgb "#eaebed" fillstyle transparent solid 1 border,\
+###     NaN title "AP \\{5,6\\}" with boxes lt 2 fc rgb "#ffeec4" fillstyle transparent solid 1 border;
+###     #15 w linespoints  t "e2e" lc "#fc4f30" lt 7 ps 0.3;
+###     #15 w linespoints  t "e2e" lc "#fc4f30" lt 7 ps 0.3;
+
+
+
+
