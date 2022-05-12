@@ -242,7 +242,7 @@ pd.DataFrame(df_dict_noT).to_csv('noT-stack-plot.csv', index=False)
 noDelay_attachments = {
     'r1_r3': 'R3',
     'r3_r2': 'R3',
-    'r2_r4': 'R3',
+    'r2_r4': 'R4',
     'r4_r5': 'R5',
     'r5_r6': 'R6'
 }
@@ -313,4 +313,115 @@ df_dict_noDelay['ne_latency'] = noDelay_ne_latencies
 df_dict_noDelay['fe_latency'] = noDelay_fe_latencies
 df_dict_noDelay['cs_latency'] = noDelay_cs_latencies
 pd.DataFrame(df_dict_noDelay).to_csv('noDelay-stack-plot.csv', index=False)
+
+
+
+
+
+############
+# SoA plot #
+############
+# Durations at each location
+durations = {
+    'r1_r3': 28, #1-28 R1
+    'r3_r2': 20, #29-48 R3
+    'r2_r4': 52, #49-100 R2
+    'r4_r5': 50, #101-150 R5
+    'r5_r6': 50, #151-200 R6
+    'r6_r5': 50, #151-200 R6
+    'r5_r6': 83, #201-283 R6
+    'r5_r4': 34, #284-317 R5
+    'r4_r2': 34, #318-362 R4
+    'r2_r3': 20, #363-383 R2
+    'r3_r1': 82, #363-444 R3
+}
+
+# Read experimental latencies
+SoA_df = pd.read_csv('soa2_p.txt', header=None, index_col=False, delimiter=' ')
+SoA_df.columns = ['time','delay']
+
+
+# SoA PoA attachments
+SoA_attachments = {
+    'r1_r3': 'R1',
+    'r3_r2': 'R3',
+    'r2_r4': 'R2',
+    'r4_r5': 'R5',
+    'r5_r6': 'R6',
+    'r6_r5': 'R6',
+    'r5_r6': 'R6',
+    'r5_r4': 'R5',
+    'r4_r2': 'R4',
+    'r2_r3': 'R2',
+    'r3_r1': 'R3',
+}
+
+# SoA server selections
+SoA_server = {
+    'r1_r3': 'cs',
+    'r3_r2': 'cs',
+    'r2_r4': 'cs',
+    'r4_r5': 'cs',
+    'r5_r6': 'cs',
+    'r6_r5': 'cs',
+    'r5_r6': 'cs',
+    'r5_r4': 'cs',
+    'r4_r2': 'cs',
+    'r2_r3': 'cs',
+    'r3_r1': 'cs',
+}
+
+
+
+
+# Create a list of SoA decision PoA elections over time
+SoA_poa_election = []
+for k in durations.keys():
+    SoA_poa_election += [SoA_attachments[k]]*durations[k]
+# Create a list of OPT servers' selecion
+SoA_server_election = []
+for k in durations.keys():
+    SoA_server_election += [SoA_server[k]]*durations[k]
+
+
+
+# latencies towards servers in the SoAimal decisions
+# latencies towards PoA in the SoAimal decisions
+SoA_ne_latencies = [0]*len(SoA_poa_election)
+SoA_fe_latencies = [0]*len(SoA_poa_election)
+SoA_cs_latencies = [0]*len(SoA_poa_election)
+SoA_PoA_latencies = {
+    k: [0]*len(time)
+    for k in poa_latencies.keys()
+}
+for t in time:
+    t -= 1
+    PoA = SoA_poa_election[t]
+    server = SoA_server_election[t]
+
+    # Specify latencies towards PoA
+    SoA_PoA_latencies[PoA][t] = max(0, SoA_df.iloc[t]['delay'] - poa_to_server[PoA][server])
+
+    if server == 'ne':
+        SoA_ne_latencies[t] = max(0, SoA_df.iloc[t]['delay'] - SoA_PoA_latencies[PoA][t])
+    elif server == 'fe':
+        SoA_fe_latencies[t] = max(0, SoA_df.iloc[t]['delay'] - SoA_PoA_latencies[PoA][t])
+    elif server == 'cs':
+        SoA_cs_latencies[t] = max(0, SoA_df.iloc[t]['delay'] - SoA_PoA_latencies[PoA][t])
+
+
+# Create the stacked curves CSV for SoAimal decision
+df_dict_SoA = {}
+df_dict_SoA['time'] = time
+max_time = len(time)
+for PoA in SoA_PoA_latencies.keys():
+    df_dict_SoA[f'{PoA}_latency'] = SoA_PoA_latencies[PoA][:max_time]
+df_dict_SoA['PoA'] = SoA_poa_election[:max_time]
+df_dict_SoA['server'] = SoA_server_election[:max_time]
+df_dict_SoA['ne_latency'] = SoA_ne_latencies[:max_time]
+df_dict_SoA['fe_latency'] = SoA_fe_latencies[:max_time]
+df_dict_SoA['cs_latency'] = SoA_cs_latencies[:max_time]
+pd.DataFrame(df_dict_SoA).to_csv('SoA-stack-plot.csv', index=False)
+
+
 
