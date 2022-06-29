@@ -1,0 +1,131 @@
+reset;
+set border lw 3 lc "gray";
+set terminal pngcairo font "arial,12" size 2000, 400
+#set terminal png size "900,300"
+#set terminal postscript eps  font "arial,10"
+#set term eps ;
+set grid y ls 13 front;
+set grid x ls 13 front;
+
+set style line 13 lc rgb 'gray' lt 1 lw 1;
+set tics textcolor rgb "black" ;
+set datafile separator ","
+set output "multi.png"
+#set output "multiplt.png";
+#set output "test.eps";
+#set lmargin at screen 0.15
+#set rmargin at screen 0.95
+set size  1,1
+#set offsets
+#set autoscale fix
+set multiplot layout 1,4 # margin 0.1,0.9,0.9,0.1 spacing 0.025,0.025
+
+
+#set tmargin 1.8
+set bmargin 5
+#set rmargin 2.5
+#set lmargin .5
+#set grid front
+set xlabel 'time [sec]'
+set ylabel 'delay [ms]'
+set yrange [0:16]
+#set xrange [0:400]
+set ylabel font ",12"
+set xlabel font ",12"
+set tics   textcolor rgb "black" font ",12"
+#set size ratio 0.50
+#set key default
+#set key horizontal
+set key bottom center at screen 0.45,0  maxrows 1 font ",13"
+#set key outside top horizontal maxrows 1 box
+set grid front
+############
+# PLOT SoA #
+############
+#set size 1,0.50
+#set origin 0.0,0.10
+#set size 0.5,0.5
+#set origin 0,0.5
+#unset key
+set title "(a) Without AAN"
+unset yrange
+
+set yrange [:40]
+plot \
+  "SoA-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10+$11+$12) title 'cloud'     smooth bezier with filledcurves x1     lc '#de2d26', \
+  "SoA-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10+$11    ) title 'far edge'  smooth bezier with filledcurves x1  lc '#fc9272', \
+  "SoA-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10        ) title 'near edge' smooth bezier with filledcurves x1 lc '#fee0d2', \
+  "SoA-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7            ) title 'R6'        smooth bezier with filledcurves x1 lc '#eff3ff', \
+  "SoA-stack-plot.csv" using 1:($2+$3+$4+$5+$6               ) title 'R5'        smooth bezier with filledcurves x1 lc '#c6dbef', \
+  "SoA-stack-plot.csv" using 1:($2+$3+$4+$5                  ) title 'R4'        smooth bezier with filledcurves x1 lc '#9ecae1', \
+  "SoA-stack-plot.csv" using 1:($2+$3+$4                     ) title 'R3'        smooth bezier with filledcurves x1 lc '#6baed6', \
+  "SoA-stack-plot.csv" using 1:($2+$3                        ) title 'R2'        smooth bezier with filledcurves x1 lc '#3182bd', \
+  "SoA-stack-plot.csv" using 1:($2                           ) title 'R1'        smooth bezier with filledcurves x1 lc '#08519c', \
+  15 w lines notitle lc "black" lw 2 dt 2,
+
+unset yrange
+
+################
+# PLOT OPTIMAL #
+################
+
+#set size ratio 0.50
+unset key
+set title "(b) AAN"
+set tics font ",14"
+plot \
+  "opt-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10+$11+$12) title 'cloud'     smooth bezier  with filledcurves x1     lc '#de2d26', \
+  "opt-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10+$11    ) title 'far edge'  smooth bezier  with filledcurves x1  lc '#fc9272', \
+  "opt-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10        ) title 'near edge' smooth bezier  with filledcurves x1 lc '#fee0d2', \
+  "opt-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7            ) title 'R6'        smooth bezier  with filledcurves x1 lc '#eff3ff', \
+  "opt-stack-plot.csv" using 1:($2+$3+$4+$5+$6               ) title 'R5'        smooth bezier  with filledcurves x1 lc '#c6dbef', \
+  "opt-stack-plot.csv" using 1:($2+$3+$4+$5                  ) title 'R4'        smooth bezier  with filledcurves x1 lc '#9ecae1', \
+  "opt-stack-plot.csv" using 1:($2+$3+$4                     ) title 'R3'        smooth bezier  with filledcurves x1 lc '#6baed6', \
+  "opt-stack-plot.csv" using 1:($2+$3                        ) title 'R2'        smooth bezier  with filledcurves x1 lc '#3182bd', \
+  "opt-stack-plot.csv" using 1:($2                           ) title 'R1'        smooth bezier  with filledcurves x1 lc '#08519c', \
+  15 w lines notitle lc "black" lw 2 dt 2,
+
+########################################
+# PLOT no wireless capacity constraint #
+########################################
+
+#set key  default
+unset key
+set title "(c) AAN ignoring radio"
+
+plot \
+  "noT-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10+$11+$12) title 'cloud'      smooth bezier with filledcurves x1     lc '#de2d26', \
+  "noT-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10+$11    ) title 'far edge'   smooth bezier with filledcurves x1  lc '#fc9272', \
+  "noT-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10        ) title 'near edge'  smooth bezier with filledcurves x1 lc '#fee0d2', \
+  "noT-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7            ) title 'R6'         smooth bezier with filledcurves x1 lc '#eff3ff', \
+  "noT-stack-plot.csv" using 1:($2+$3+$4+$5+$6               ) title 'R5'         smooth bezier with filledcurves x1 lc '#c6dbef', \
+  "noT-stack-plot.csv" using 1:($2+$3+$4+$5                  ) title 'R4'         smooth bezier with filledcurves x1 lc '#9ecae1', \
+  "noT-stack-plot.csv" using 1:($2+$3+$4                     ) title 'R3'         smooth bezier with filledcurves x1 lc '#6baed6', \
+  "noT-stack-plot.csv" using 1:($2+$3                        ) title 'R2'         smooth bezier with filledcurves x1 lc '#3182bd', \
+  "noT-stack-plot.csv" using 1:($2                           ) title 'R1'         smooth bezier with filledcurves x1 lc '#08519c', \
+  15 w lines notitle lc "black" lw 2 dt 2,
+
+############################
+# PLOT no delay constraint #
+############################
+#set size 1,0.50
+#set origin 0.0,0.32
+#set size ratio 0.50
+
+unset key
+set title "(d) AAN ignoring latency"
+
+plot \
+  "noDelay-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10+$11+$12) title 'cloud'      smooth bezier with filledcurves x1     lc '#de2d26', \
+  "noDelay-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10+$11    ) title 'far edge'   smooth bezier with filledcurves x1  lc '#fc9272', \
+  "noDelay-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7+$10        ) title 'near edge'  smooth bezier with filledcurves x1 lc '#fee0d2', \
+  "noDelay-stack-plot.csv" using 1:($2+$3+$4+$5+$6+$7            ) title 'R6'         smooth bezier with filledcurves x1 lc '#eff3ff', \
+  "noDelay-stack-plot.csv" using 1:($2+$3+$4+$5+$6               ) title 'R5'         smooth bezier with filledcurves x1 lc '#c6dbef', \
+  "noDelay-stack-plot.csv" using 1:($2+$3+$4+$5                  ) title 'R4'         smooth bezier with filledcurves x1 lc '#9ecae1', \
+  "noDelay-stack-plot.csv" using 1:($2+$3+$4                     ) title 'R3'         smooth bezier with filledcurves x1 lc '#6baed6', \
+  "noDelay-stack-plot.csv" using 1:($2+$3                        ) title 'R2'         smooth bezier with filledcurves x1 lc '#3182bd', \
+  "noDelay-stack-plot.csv" using 1:($2                           ) title 'R1'         smooth bezier with filledcurves x1 lc '#08519c', \
+  15 w lines notitle lc "black" lw 2 dt 2,
+
+
+unset multiplot
