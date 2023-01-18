@@ -1,0 +1,15 @@
+reset;
+set terminal pdfcairo font "Times-New-Roman,12:bold" size 15cm,10cm 
+set datafile separator ","
+set output "cdf-bw.pdf"
+set xlabel 'Bandwith (Mb/s)'
+set ylabel 'CDF'
+
+set ylabel font ",14"
+set xlabel font ",14"
+set grid front
+set tics font ",14"
+set key left top vertical Right noreverse enhanced autotitle
+plot "BW-cdf.csv" using 2:(1.) smooth cnorm  title "our solution", \
+     "BW-cdf.csv" using 3:(1.) smooth cnorm  title "Solution [4]" , \
+     "BW-cdf.csv" using 4:(1.) smooth cnorm  title "Solution [2]", \
