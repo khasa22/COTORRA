@@ -1,0 +1,14 @@
+reset;
+set terminal pdfcairo font "Times-New-Roman,12:bold" size 17cm,6cm
+set datafile separator ","
+set output "d-cdf.pdf"
+set xlabel 'Delay [ms]'
+set ylabel 'CDF'
+set ylabel font ",14"
+set xlabel font ",14"
+set grid front
+
+set key left top vertical Right noreverse enhanced autotitle
+plot "Delay-cdf.csv" using 2:(1.) smooth cnorm  title "our delay", \
+     "Delay-cdf.csv" using 3:(1.) smooth cnorm  title "delay[4]" , \
+     "Delay-cdf.csv" using 4:(1.) smooth cnorm  title "delay[2]", \
