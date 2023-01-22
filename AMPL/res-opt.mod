@@ -53,7 +53,7 @@ var avl{si in S, (v1,v2) in VL[si], (n1,n2) in E} binary ;
 
 maximize resources: sum {n in N} comput_res[n]-
 sum {s1 in S,n in N}
-         sum {vf in VNF[s1]} avf[s1,vf,n]*c[s1,vf]i
+         sum {vf in VNF[s1]} avf[s1,vf,n]*c[s1,vf]
 + sum {(n1, n2) in E} lambda[n1,n2]-
 sum{si in S,(n1,n2) in E}
          sum {(v1,v2) in VL[si]}avl[si, v1,v2, n1,n2]*vf_throughput[si,v1,v2];
