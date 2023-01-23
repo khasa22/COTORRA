@@ -1,0 +1,17 @@
+reset;
+set terminal pdfcairo font "Times-New-Roman,12:bold" size 17cm,8cm 
+set datafile separator ","
+set output "cdf-cost.pdf"
+set xlabel 'Cost'
+set ylabel 'CDF'
+
+set ylabel font ",14"
+set xlabel font ",14"
+set grid front
+set tics font ",14"
+#set style fill solid 1.0 noborder
+#set style function filledcurves y1=0
+set key left top vertical Right noreverse enhanced autotitle
+plot "cost.csv" using 2:(1.)   smooth cnorm  title "our SNR", \
+     "cost.csv" using 3:(1.) smooth cnorm  title "SNR [4]"  , \
+    "cost.csv" using 4:(1.)   smooth cnorm  title "SNR [2]" , \
