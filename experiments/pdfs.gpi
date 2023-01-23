@@ -1,0 +1,116 @@
+
+
+
+
+
+
+###############
+## DELAY PDF ##
+###############
+reset;
+#set terminal pdfcairo font "Times-New-Roman,12:bold" size 17cm,8cm
+set term pdf
+set datafile separator ","
+set output "/tmp/delay-pdf.pdf"
+set xlabel 'Delay [ms]'
+set ylabel 'ePDF'
+set ylabel font ",14"
+set xlabel font ",14"
+set grid lt -1 lc 'gray' lw .25
+set xtics out nomirror
+set ytics out nomirror
+
+
+# Gray color palette
+set ls 1 lc '#0f525252'
+set ls 2 lc '#0f969696'
+set ls 3 lc '#0fcccccc'
+
+#set key left top vertical Right noreverse enhanced autotitle
+
+set yrange [:.0055]
+set arrow front from 15,0 to 15,.0055 nohead dt 1 lw 3
+set label 'latency requirement' at 15.75,.0045 rotate by 270
+
+plot "Delay-cdf.csv" u 2:(1/100.) smooth kdens bandwidth 3 w filledcurves y=0 ls 1  title "our delay", \
+     "Delay-cdf.csv" u 3:(1/100.) smooth kdens bandwidth 3 w filledcurves y=0 ls 2  title "delay[4]" , \
+     "Delay-cdf.csv" u 4:(1/100.) smooth kdens bandwidth 3 w filledcurves y=0 ls 3  title "delay[2]", \
+
+
+
+
+
+
+
+
+
+
+############
+## BW PDF ##
+############
+reset;
+#set terminal pdfcairo font "Times-New-Roman,12:bold" size 17cm,8cm
+set term pdf
+set datafile separator ","
+set output "/tmp/bw-pdf.pdf"
+set xlabel 'BW [Mbps]'
+set ylabel 'ePDF'
+set ylabel font ",14"
+set xlabel font ",14"
+set grid lt -1 lc 'gray' lw .25
+set xtics out nomirror
+set ytics out nomirror format "%.4f"
+
+
+# Gray color palette
+set ls 1 lc '#0f525252' 
+set ls 2 lc '#0f969696'
+set ls 3 lc '#0fcccccc' 
+
+#set key left top vertical Right noreverse enhanced autotitle
+
+set key top left
+set yrange [:.0025]
+
+plot "BW-cdf.csv" using 3:(1/100.) smooth kdens bandwidth 5 w filledcurves y=0 ls 2  title "Solution [4]" , \
+     "BW-cdf.csv" using 2:(1/100.) smooth kdens bandwidth 5 w filledcurves y=0 ls 1  title "our solution", \
+     "BW-cdf.csv" using 4:(1/100.) smooth kdens bandwidth 5 w filledcurves y=0 ls 3 title "Solution [2]"
+
+
+
+
+
+
+#############
+## SNR PDF ##
+#############
+reset;
+#set terminal pdfcairo font "Times-New-Roman,12:bold" size 17cm,8cm
+set term pdf
+set datafile separator ","
+set output "/tmp/snr-pdf.pdf"
+set xlabel 'SNR [dBm]'
+set ylabel 'ePDF'
+set ylabel font ",14"
+set xlabel font ",14"
+set grid lt -1 lc 'gray' lw .25
+set xtics out nomirror
+set ytics out nomirror format "%.4f"
+
+
+# Gray color palette
+set ls 1 lc '#0f525252' 
+set ls 2 lc '#0f969696'
+set ls 3 lc '#0fcccccc' 
+
+#set key left top vertical Right noreverse enhanced autotitle
+
+set key top left
+set yrange [:.0275]
+
+
+plot "snr.csv" using 3:(1/100.)  smooth kdens bandwidth 1 w filledcurves y=0 ls 2 title "SNR [4]" , \
+     "snr.csv" using 2:(1/100.)  smooth kdens bandwidth 1 w filledcurves y=0 ls 1 title "our SNR", \
+    "snr.csv" using  4:(1/100.)  smooth kdens bandwidth 1 w filledcurves y=0 ls 3 title "SNR [2]", \
+
+
