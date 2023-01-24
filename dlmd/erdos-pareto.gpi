@@ -1,0 +1,36 @@
+set term eps
+set out '/tmp/pareto-bound.eps'
+set key autotitle columnhead
+set datafile separator ','
+
+set xlabel 'n'
+set ylabel 'p'
+# set logscale y
+set xrange [:123]
+set yrange [0:.17]
+
+set ytics format "%.2f" nomirror
+set xtics nomirror
+
+set grid
+
+# set object rectangle from 69,0.059 to 103,0.069 front 
+# set label at 70,0.064 'Realistic Erdős–Rényi graphs' front  
+
+set key box width .001
+
+
+set style fill transparent solid 0.5 noborder
+
+set label at 50,0.155 'small \& dense' left textcolor 'blue'
+set arrow from 49,0.155 to 42,0.155  front head filled lw 3 lc 'blue'
+set object circle at 37,0.155 radius 4 front fc rgb 'blue'
+
+
+set label at 108,0.02 'large \& sparse' right textcolor 'red'
+set arrow from 109,0.02 to 115,0.02 front head filled lw 3 lc 'red'
+set object circle at 119,0.027 radius 4 front fc rgb 'red' 
+
+plot 'pareto-front.csv' u 3:2 pt 7 ps 1.2 lc rgb 'gray' title 'Realistic Erdős–Rényi setup'
+
+
