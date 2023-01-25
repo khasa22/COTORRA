@@ -1,0 +1,17 @@
+{
+    "number_of" : {
+        "cloud": 6,
+        "far_edge": 4,
+        "near_edge": 2
+    },
+    "degree_of" : {
+        "cloud": 6,
+        "far_edge": 4,
+        "near_edge": 2
+    },
+    "cpus": {
+        "cloud": 16,
+        "far_edge": 8,
+        "near_edge": 4
+    }
+}

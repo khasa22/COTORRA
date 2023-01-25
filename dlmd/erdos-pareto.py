@@ -3,6 +3,8 @@
 
 import numpy as np
 import pandas as pd
+import json
+
 
 def fact(n):
     # returns n!
@@ -21,17 +23,13 @@ if __name__ == '__main__':
     urtinsa_df = urtinsa_df[(urtinsa_df['Radio'] == 'LTE')]
     print(f'There are {len(urtinsa_df)} cells @Urtinsa')
 
-
-    number_of = {
-        'cloud': 6,
-        'far_edge': 4,
-        'near_edge': 2,
-    }
-    degree_of = {
-        'cloud': 6,
-        'far_edge': 4,
-        'near_edge': 2,
-    }
+  
+    # Opening JSON file with server specifications
+    # how many of each one, and the degree they should've in the graph
+    with open('server-specs.json') as f:
+        server_specs = json.load(f)
+    number_of = server_spects['number_of']
+    degree_of = server_spects['degree_of']
 
     feasibles = {
         'p': [],
