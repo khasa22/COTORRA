@@ -1,0 +1,127 @@
+#########
+# delay #
+#########
+reset
+set term pdf
+set out '/tmp/stress-delay.pdf'
+set datafile separator ','
+
+set xlabel 'network stress [%]'
+set ylabel 'service delay [ms]'
+set yrange [0:10]
+
+set grid
+set key 
+
+plot 'stress-test-small_G.csv' u 1:43:59  w filledcurve fc rgb 'red' fs transparent solid .5 t '80% conf.',\
+                            '' u 1:40 w l smooth sbezier lc rgb 'red' lw 4 t 'median',\
+     'stress-test-large_G.csv' u 1:43:59 w filledcurve fc rgb 'blue' fs transparent solid .5  t '80% conf.',\
+     'stress-test-large_G.csv' u 1:40 w l smooth sbezier lc rgb 'blue' lw 4 t 'median'
+
+
+
+#########################
+# successful migrations #
+#########################
+reset
+set term pdf
+set out '/tmp/stress-migrations.pdf'
+set datafile separator ','
+
+set xlabel 'network stress [%]'
+set ylabel 'successful migrations [%]'
+set yrange [0:1.1]
+
+set grid
+set key 
+
+plot 'stress-test-small_G.csv' u 1:38 w l smooth sbezier lc rgb 'red' lw 4 t 'small & dense',\
+     'stress-test-large_G.csv' u 1:38 w l smooth sbezier lc rgb 'blue' lw 4 t 'large & sparse'
+
+
+
+# CSV columns location
+## column: 2 = completed_10000000
+## column: 3 = delay_10000000
+## column: 4 = free_edge_10000000
+## column: 5 = completed_10000001
+## column: 6 = delay_10000001
+## column: 7 = free_edge_10000001
+## column: 8 = completed_10000002
+## column: 9 = delay_10000002
+## column: 10 = free_edge_10000002
+## column: 11 = completed_10000003
+## column: 12 = delay_10000003
+## column: 13 = free_edge_10000003
+## column: 14 = completed_10000004
+## column: 15 = delay_10000004
+## column: 16 = free_edge_10000004
+## column: 17 = completed_10000005
+## column: 18 = delay_10000005
+## column: 19 = free_edge_10000005
+## column: 20 = completed_10000006
+## column: 21 = delay_10000006
+## column: 22 = free_edge_10000006
+## column: 23 = completed_10000007
+## column: 24 = delay_10000007
+## column: 25 = free_edge_10000007
+## column: 26 = completed_10000008
+## column: 27 = delay_10000008
+## column: 28 = free_edge_10000008
+## column: 29 = completed_10000009
+## column: 30 = delay_10000009
+## column: 31 = free_edge_10000009
+## column: 32 = completed_10000010
+## column: 33 = delay_10000010
+## column: 34 = free_edge_10000010
+## column: 35 = completed_10000011
+## column: 36 = delay_10000011
+## column: 37 = free_edge_10000011
+## column: 38 = completion_percentage
+## column: 39 = delay_avg
+## column: 40 = delay_median
+## column: 41 = delay_percentile_0.00
+## column: 42 = delay_percentile_5.00
+## column: 43 = delay_percentile_10.00
+## column: 44 = delay_percentile_15.00
+## column: 45 = delay_percentile_20.00
+## column: 46 = delay_percentile_25.00
+## column: 47 = delay_percentile_30.00
+## column: 48 = delay_percentile_35.00
+## column: 49 = delay_percentile_40.00
+## column: 50 = delay_percentile_45.00
+## column: 51 = delay_percentile_50.00
+## column: 52 = delay_percentile_55.00
+## column: 53 = delay_percentile_60.00
+## column: 54 = delay_percentile_65.00
+## column: 55 = delay_percentile_70.00
+## column: 56 = delay_percentile_75.00
+## column: 57 = delay_percentile_80.00
+## column: 58 = delay_percentile_85.00
+## column: 59 = delay_percentile_90.00
+## column: 60 = delay_percentile_95.00
+## column: 61 = delay_percentile_100.00
+## column: 62 = free_edge_avg
+## column: 63 = free_edge_median
+## column: 64 = free_edge_percentile_0.00
+## column: 65 = free_edge_percentile_5.00
+## column: 66 = free_edge_percentile_10.00
+## column: 67 = free_edge_percentile_15.00
+## column: 68 = free_edge_percentile_20.00
+## column: 69 = free_edge_percentile_25.00
+## column: 70 = free_edge_percentile_30.00
+## column: 71 = free_edge_percentile_35.00
+## column: 72 = free_edge_percentile_40.00
+## column: 73 = free_edge_percentile_45.00
+## column: 74 = free_edge_percentile_50.00
+## column: 75 = free_edge_percentile_55.00
+## column: 76 = free_edge_percentile_60.00
+## column: 77 = free_edge_percentile_65.00
+## column: 78 = free_edge_percentile_70.00
+## column: 79 = free_edge_percentile_75.00
+## column: 80 = free_edge_percentile_80.00
+## column: 81 = free_edge_percentile_85.00
+## column: 82 = free_edge_percentile_90.00
+## column: 83 = free_edge_percentile_95.00
+## column: 84 = free_edge_percentile_100.00
+
