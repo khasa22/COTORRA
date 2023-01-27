@@ -11,11 +11,27 @@ import copy
 # DLMD FUNCTIONS #
 ##################
 
-def dlmd(G, SFC, PoAs):
+def shortest_and_weight(G, src, dst, weight_fn):
+    # Finds the shortest path between src and dst using as cost the weight_fn
+    # using Dijkstra
+    # The weight_fn receives the edge enedpoints and the edge data
+
+    path = shortest_path(G, source=src, target=dst,
+                         weight=weight_fn, method='dijkstra')
+    path_weight = [weight_fn(n1,n2,G.edges[n1,n2])\
+            for n1,n2 in zip(path[:-1], path[1:])]
+    
+    return path, path_weight
+
+
+
+def dlmd(G, SFC, PoA):
     # Executes de DLMD algorithm and yields the VF-placement for a robotic
     # service with a robot that can be attached to the PoAs. 
-    # The code asumes the feasible PoAs are done.
+    # The code asumes the best PoA is obtained.
+    # TODO: update it to do the SNR filtering outside
     # The SFC is a graph
+
 
     # Server level function l(s)
     l = lambda s: 1 if G.nodes[s]['type'] == 'cloud' else (
@@ -25,10 +41,18 @@ def dlmd(G, SFC, PoAs):
     low_bw = lambda G,bw: [e for e,d in G.edges(data=True)\
                             if d['bandwidth'] <= bw]
 
+    # Check the used CPUs @server=s in the deployment
+    used_cpus = lambda s,dep,G,SFC: sum([SFC.nodes[vf]['cpus']\
+            for vf in dep if (len(vf)==1) and dep[vf]==s])
+
     # Dijkstra weight function using the delay and used bw
     dlmd_weight_G = lambda n1,n2,G: G.edges(data=True)[n1,n2]['delay'] +\
                                     G.edges(data=True)[n1,n2]['used_bw']
     dlmd_weight = lambda n1,n2,data: data['delay'] + data['used_bw']
+
+    # Distance
+    # TODO
+    dlmd_w_to_poa = lambda s,PoA,G: dlmd_weight_G(s,PoA,G)
 
 
     # Deployment
@@ -48,11 +72,17 @@ def dlmd(G, SFC, PoAs):
     for vf in vfs:
         min_eta = 1000
 
-        # TODO: add also the prior vfs deployed there
-        for s in [s for s in servers\
-                if SFC.nodes[vf]['cpus'] <= G.nodes[s]['cpus']]:
+        # Find the server deployment or steer to PoA
+        for s in servers if vf != vfs[-1] else PoA:
+            # Check if server s has enough CPUs
+            free_cpus = G.nodes[s]['cpus']] - used_cpus(s,deployment,G,SFC)
+            if SFC.nodes[vf]['cpus'] <= free_cpus:
+                continue
+
             # Server cost
-            eta = l(s)
+            _, server_poa_eta = shortest_and_weight(G=G, src=s, dst=PoA,
+                                                    weight_fn=dlmd_weight)
+            eta = l(s) + server_poa_eta
             
             # link cost
             if hop > 0 and hop < len(vls):
@@ -68,10 +98,9 @@ def dlmd(G, SFC, PoAs):
                 # Find path between (vf,vf-1)
                 s_1 = deployment[v_1]
                 try networkx.exception.NetworkXNoPath as no_path:
-                    path = shortest_path(G_pruned, source=s_1, target=s,
-                                         weight=dlmd_weight, method='dijkstra')
-                    eta += [dlmd_weight_G(n1,n2,G_pruned)\
-                            for n1,n2 in zip(path[:-1], path[1:])]
+                    path, path_eta = shortest_and_weight(
+                            G=G_pruned, src=s_1, dst=s, weight_fn=dlmd_weight)
+                    eta += path_eta
                 except no_path:
                     path = []
                     eta += 100000
@@ -182,17 +211,50 @@ def stress_network(G, p_step=0.1):
 
 
 if __name__ == '__main__':
+    # Read the infrastructure CSV
+    G = pd.read_csv('small_G.csv')
+
     # Create the SFC
     SFC_len = 3
     SFC = nx.path_graph(SFC_len)
     VF_cpus = 1
     nx.set_node_attributes(SFC, {n: VF_cpus for n in range(SFC_len)}, 'cpus')
+    SFC[SCF_len]['cpus'] = 0
     print('SFC created ')
 
-    # Create the stressed networks
-    for G_ in stressed_networks:
-        dlmd()
-        dlmd(G_, SFC, PoAs)
+    # Store the stress-test results
+    p_step = 0.1
+    stress_test = {}
 
-    # TODO: add to the DLMD the steering to the PoA
+    # Create the stressed networks
+    for p, G_ in stressed_networks().items:
+        cells = [n for n in G_.nodes(data=True) if G_.nodes[n]['type']=='cell']
+        stress_test[p] = {}
+
+        # Deploy as the robot moves
+        for cell in cells:
+            deployment, completed = dlmd(G_, SFC, PoAs)
+
+            # Store deployment results
+            stress_test[p][f'completed_{cell}'] = completed
+            stress_test[p][f'delay_{cell}'] = deployment_delay(G, deployment)
+            stress_test[p][f'free_edge_{cell}'] = deployment_free_edge(G, SFC,
+                                                                   deployment)
+
+    # Store the stress-test in a CSV
+    df_dict = {p: [] for p in stress_test.keys()}
+    for p in df_dict:
+        columns = []
+        for cell in cells:
+            df_dict[p] += [
+                stress_test[p][f'completed_{cell}'],
+                stress_test[p][f'delay_{cell}'],
+                stress_test[p][f'free_edge_{cell}'],
+            ]
+            columns += [
+                f'completed_{cell}',
+                f'delay_{cell}',
+                f'free_edge_{cell}',
+            ]
+    pd.DataFrame(df_dict, columns=columns).to_csv('/tmp/stress-test.csv')
 
