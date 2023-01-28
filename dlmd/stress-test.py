@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import copy
 import argparse
-
+import time
 
 
 
@@ -156,31 +156,68 @@ def deployment_delay(G, deployment):
     return delay
 
 
-def deployment_free_edge(G, SFC, deployment):
+def deployment_free_edge(G, G_, SFC, deployment):
     # Calculates the free edge resources at the edge 
+    # using the original graph G, and the stressed graph G_
     # note: the deployment must have been successfull
+    # returns: free_ALL_edge, free_far_edge, free_near_edge
 
     n_edges = [n for n,d in G.nodes(data=True)\
                 if ('type' in d) and (d['type']=='near_edge')]
     n_edge_cpus = sum([d['cpus'] for n,d in G.nodes(data=True)\
                         if ('type' in d) and (d['type']=='near_edge')])
+    n_edge_cpus_ = sum([d['cpus'] for n,d in G_.nodes(data=True)\
+                        if ('type' in d) and (d['type']=='near_edge')])
     f_edges = [n for n,d in G.nodes(data=True)\
                 if ('type' in d) and (d['type']=='far_edge')]
     f_edge_cpus = sum([d['cpus'] for n,d in G.nodes(data=True)\
                         if ('type' in d) and (d['type']=='far_edge')])
+    f_edge_cpus_ = sum([d['cpus'] for n,d in G_.nodes(data=True)\
+                        if ('type' in d) and (d['type']=='far_edge')])
 
     # Total edge resource
     total_edge = n_edge_cpus + f_edge_cpus
-    consumed_edge = 0
+    consumed_n_edge = 0
+    consumed_f_edge = 0
 
+    # Derive the resource consumption
     for vf in SFC.nodes:
-        if G.nodes[deployment[vf]]['type'] != 'cloud':
-            consumed_edge += SFC.nodes[vf]['cpus']
+        if G.nodes[deployment[vf]]['type'] == 'near_edge':
+            consumed_n_edge += SFC.nodes[vf]['cpus']
+        elif G.nodes[deployment[vf]]['type'] == 'far_edge':
+            consumed_f_edge += SFC.nodes[vf]['cpus']
+    consumed_edge = consumed_n_edge + consumed_f_edge
             
+    # Derive free resources
+    free_all_edge = (n_edge_cpus_+ f_edge_cpus_ - consumed_edge) /\
+                        (n_edge_cpus + f_edge_cpus)
+    free_far_edge = (f_edge_cpus_ - consumed_f_edge) / f_edge_cpus
+    free_near_edge = (n_edge_cpus_ - consumed_n_edge) / n_edge_cpus
 
-    return 1 - consumed_edge/total_edge
+    return free_all_edge, free_far_edge, free_near_edge
     
     
+
+
+def print_server_resources(G):
+    # prints the CPUs of servers
+
+    cloud_cpus, f_edge_cpus, n_edge_cpus = 0, 0, 0
+
+    for n in G.nodes:
+        if 'type' in G.nodes[n]:
+            if G.nodes[n]['type'] == 'cloud':
+                cloud_cpus += G.nodes[n]['cpus']
+            elif G.nodes[n]['type'] == 'far_edge':
+                f_edge_cpus += G.nodes[n]['cpus']
+            elif G.nodes[n]['type'] == 'near_edge':
+                n_edge_cpus += G.nodes[n]['cpus']
+
+    print(f'== Server resources @{G} ==')
+    print(f'{cloud_cpus}CPUs @cloud')
+    print(f'{f_edge_cpus}CPUs @far edge')
+    print(f'{n_edge_cpus}CPUs @near edge')
+            
 
 
 
@@ -203,35 +240,51 @@ def stress_network(G, p_step=0.1):
                if 'type' in d and d['type']=='cloud']
 
     # CPU sums
-    n_edge_cpus = G.nodes(data=True)[n_edges[0]]['cpus']
-    f_edge_cpus = G.nodes(data=True)[f_edges[0]]['cpus']
-    cloud_cpus = G.nodes(data=True)[clouds[0]]['cpus']
-
-    # CPU decreases and edge removal steps
-    edges_step = int(len(G.edges) * p_step)
-    n_edge_step = int(n_edge_cpus * p_step)
-    f_edge_step = int(f_edge_cpus * p_step)
-    cloud_step = int(cloud_cpus * p_step)
+    n_edge_cpus = sum([G.nodes[s]['cpus'] for s in n_edges])
+    f_edge_cpus = sum([G.nodes[s]['cpus'] for s in f_edges])
+    cloud_cpus = sum([G.nodes[s]['cpus'] for s in clouds])
 
     for p in np.arange(p_step, 1, p_step):
         # Get the copy for this p and store it
-        G_ = copy.deepcopy(stressed_networks[round(p-p_step, 2)])
+        G_ = copy.deepcopy(G)
         stressed_networks[round(p,2)] = G_
+        print(f'stress @{p}')
+
+        # Compute #edges & CPUs to remove
+        edges_to_remove = round(p * len(G.edges))
+        n_edge_cpus_to_remove = round(p * n_edge_cpus)
+        f_edge_cpus_to_remove = round(p * f_edge_cpus)
+        cloud_cpus_to_remove = round(p * cloud_cpus)
     
-        # Remove an edge from the highest degree node
-        for i in range(edges_step):
+        # Remove edge from the highest degree nodes
+        for _ in range(edges_to_remove):
             nodes_deg = sorted([(n, len(G_[n])) for n in G_.nodes],
                            key=lambda x: x[1], reverse=True)
             G_.remove_edge(nodes_deg[0][0], list(G_[nodes_deg[0][0]])[0])
 
-        # Remove CPUs
-        for s in n_edges:
-            G_.nodes[s]['cpus'] = max(0, G_.nodes[s]['cpus'] - n_edge_step)
-        for s in f_edges:
-            G_.nodes[s]['cpus'] = max(0, G_.nodes[s]['cpus'] - f_edge_step)
-        for s in clouds:
-            G_.nodes[s]['cpus'] = max(0, G_.nodes[s]['cpus'] - cloud_step)
+        # Remove near edge CPUs
+        i = 0
+        while n_edge_cpus_to_remove > 0:
+            s = n_edges[i]
+            G_.nodes[s]['cpus'] -= 1
+            i = (i+1) % len(n_edges)
+            n_edge_cpus_to_remove -= 1
 
+        # Remove far edge CPUs
+        i = 0
+        while f_edge_cpus_to_remove > 0:
+            s = f_edges[i]
+            G_.nodes[s]['cpus'] -= 1
+            i = (i+1) % len(f_edges)
+            f_edge_cpus_to_remove -= 1
+
+        # Remove cloud CPUs
+        i = 0
+        while cloud_cpus_to_remove > 0:
+            s = clouds[i]
+            G_.nodes[s]['cpus'] -= 1
+            i = (i+1) % len(clouds)
+            cloud_cpus_to_remove -= 1
 
     return stressed_networks
 
@@ -274,23 +327,40 @@ if __name__ == '__main__':
     # Create the stressed networks
     for p, G_ in stress_network(G, p_step).items():
         print(f'G stress: p={p} with {len(list(nx.connected_components(G_)))}')
+        print_server_resources(G_)
 
         PoAs= [n for n,d in G_.nodes(data=True)\
                 if 'type' in d and d['type']=='cell']
         stress_test[p] = {}
 
+        # Store the available resources at this step
+        av_all_edge, av_far_edge, av_near_edge =\
+            deployment_free_edge(G, G_, nx.Graph(), {})
+        stress_test[p][f'available_edge'] = av_all_edge
+        stress_test[p][f'available_far_edge'] = av_far_edge
+        stress_test[p][f'available_near_edge'] = av_near_edge
+
         # Deploy as the robot moves
         for PoA in PoAs:
+            # Execute DLMD
             print(f' DLMD@PoA={PoA}')
+            tic = time.time()
             deployment, completed = dlmd(G_, SFC, PoA)
+            tac = time.time()
 
             # Store deployment results
             stress_test[p][f'completed_{PoA}'] = completed
             stress_test[p][f'delay_{PoA}'] =\
                 deployment_delay(G, deployment) if completed else 30
-            stress_test[p][f'free_edge_{PoA}'] =\
-                deployment_free_edge(G,
+            free_all_edge, free_far_edge, free_near_edge =\
+                deployment_free_edge(G, G_,
                      SFC if completed else nx.Graph(), deployment)
+            stress_test[p][f'free_edge_{PoA}'] = free_all_edge
+            stress_test[p][f'free_far_edge_{PoA}'] = free_far_edge
+            stress_test[p][f'free_near_edge_{PoA}'] = free_near_edge
+            stress_test[p][f'dlmd_runtime_{PoA}'] = tac - tic
+
+
 
 
     ##################################
@@ -300,22 +370,45 @@ if __name__ == '__main__':
     for p in df_dict:
         columns = []
 
-        p_completions, p_delays, p_free_edges = [], [], []
+        p_completions, p_delays, p_runtimes = [], [], []
+        p_free_edges, p_free_far_edges, p_free_near_edges = [], [], []
 
+        # Specify the available resources
+        df_dict[p] += [
+            stress_test[p][f'available_edge'], 
+            stress_test[p][f'available_far_edge'],
+            stress_test[p][f'available_near_edge']
+        ]
+        columns += [
+            'available_edge', 
+            'available_far_edge',
+            'available_near_edge'
+        ]
+
+        # Specify results for each PoA
         for PoA in PoAs:
             p_completions += [stress_test[p][f'completed_{PoA}']]
             p_delays += [stress_test[p][f'delay_{PoA}']]
             p_free_edges += [stress_test[p][f'free_edge_{PoA}']]
+            p_free_far_edges += [stress_test[p][f'free_far_edge_{PoA}']]
+            p_free_near_edges += [stress_test[p][f'free_near_edge_{PoA}']]
+            p_runtimes += [stress_test[p][f'dlmd_runtime_{PoA}']]
 
             df_dict[p] += [
                 stress_test[p][f'completed_{PoA}'],
                 stress_test[p][f'delay_{PoA}'],
                 stress_test[p][f'free_edge_{PoA}'],
+                stress_test[p][f'free_far_edge_{PoA}'],
+                stress_test[p][f'free_near_edge_{PoA}'],
+                stress_test[p][f'dlmd_runtime_{PoA}'],
             ]
             columns += [
                 f'completed_{PoA}',
                 f'delay_{PoA}',
                 f'free_edge_{PoA}',
+                f'free_far_edge_{PoA}',
+                f'free_near_edge_{PoA}',
+                f'dlmd_runtime_{PoA}',
             ]
 
         #############
@@ -337,8 +430,31 @@ if __name__ == '__main__':
         df_dict[p] += [np.mean(p_free_edges)]
         columns += ['free_edge_median']
         df_dict[p] += [np.median(p_free_edges)]
+        columns += ['free_edge_min']
+        df_dict[p] += [min(p_free_edges)]
         columns += [f'free_edge_percentile_{q:.2f}' for q in percentiles]
         df_dict[p] += list(np.percentile(p_free_edges, percentiles))
+        # Free far edge
+        columns += ['free_far_edge_avg']
+        df_dict[p] += [np.mean(p_free_far_edges)]
+        columns += ['free_far_edge_median']
+        df_dict[p] += [np.median(p_free_far_edges)]
+        columns += ['free_far_edge_min']
+        df_dict[p] += [min(p_free_far_edges)]
+        columns += [f'free_far_edge_percentile_{q:.2f}' for q in percentiles]
+        df_dict[p] += list(np.percentile(p_free_far_edges, percentiles))
+        # Free near edge
+        columns += ['free_near_edge_avg']
+        df_dict[p] += [np.mean(p_free_near_edges)]
+        columns += ['free_near_edge_median']
+        df_dict[p] += [np.median(p_free_near_edges)]
+        columns += ['free_near_edge_min']
+        df_dict[p] += [min(p_free_near_edges)]
+        columns += [f'free_near_edge_percentile_{q:.2f}' for q in percentiles]
+        df_dict[p] += list(np.percentile(p_free_near_edges, percentiles))
+        # run-time
+        columns += ['max_dlmd_runtime']
+        df_dict[p] += [max(p_runtimes)]
 
     # Print it all out
     for i,col in enumerate(columns):
