@@ -1,36 +1,35 @@
-set term eps
-set out '/tmp/pareto-bound.eps'
+set term pdf font ",25"
+set out '/tmp/pareto-bound.pdf'
 set key autotitle columnhead
 set datafile separator ','
 
 set xlabel 'n'
 set ylabel 'p'
 # set logscale y
-set xrange [:123]
+set xrange [30:123]
 set yrange [0:.17]
 
-set ytics format "%.2f" nomirror
-set xtics nomirror
+set ytics out format "%.2f" nomirror 0.05
+set xtics out nomirror 20
 
-set grid
+set grid lw 0.25
 
 # set object rectangle from 69,0.059 to 103,0.069 front 
 # set label at 70,0.064 'Realistic Erdős–Rényi graphs' front  
 
-set key box width .001
-
+unset key
 
 set style fill transparent solid 0.5 noborder
 
-set label at 50,0.155 'small \& dense' left textcolor 'blue'
-set arrow from 49,0.155 to 42,0.155  front head filled lw 3 lc 'blue'
-set object circle at 37,0.155 radius 4 front fc rgb 'blue'
+set label at 50,0.145 'small \& dense' left #textcolor '#008b8b'
+set arrow from 49,0.145 to 42,0.145  front head lw 3 #filled lw 3 lc '#008b8b'
+set object circle at 37,0.145 radius 8 front fc rgb '#008b8b'
 
 
-set label at 108,0.02 'large \& sparse' right textcolor 'red'
-set arrow from 109,0.02 to 115,0.02 front head filled lw 3 lc 'red'
-set object circle at 119,0.027 radius 4 front fc rgb 'red' 
+set label at 103,0.02 'large \& sparse' right #textcolor '#FF8C00'
+set arrow from 104,0.02 to 110,0.02 front head lw 3 #filled lw 3 lc '#FF8C00'
+set object circle at 114,0.027 radius 8 front fc rgb '#FF8C00' 
 
-plot 'pareto-front.csv' u 3:2 pt 7 ps 1.2 lc rgb 'gray' title 'Realistic Erdős–Rényi setup'
+plot 'pareto-front.csv' u 3:2 pt 7 ps 1.2 lc rgb 'gray80' title 'Realistic Erdős–Rényi setup'
 
 

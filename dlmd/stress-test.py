@@ -453,6 +453,10 @@ if __name__ == '__main__':
         columns += [f'free_near_edge_percentile_{q:.2f}' for q in percentiles]
         df_dict[p] += list(np.percentile(p_free_near_edges, percentiles))
         # run-time
+        columns += [f'dlmd_runtime_percentile_{q:.2f}' for q in percentiles]
+        df_dict[p] += list(np.percentile(p_runtimes, percentiles))
+        columns += ['median_dlmd_runtime']
+        df_dict[p] += [np.median(p_runtimes)]
         columns += ['max_dlmd_runtime']
         df_dict[p] += [max(p_runtimes)]
 

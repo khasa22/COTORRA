@@ -2,30 +2,37 @@
 # free edge #
 #############
 reset
-set term pdf
+set term pdf font ",25"
+set size ratio .3
 set out '/tmp/stress-edge.pdf'
 set datafile separator ','
 
 set xlabel 'network stress [%]'
-set ylabel 'average free resources \@Edge [%]'
+set ylabel 'free Edge [%]' offset 1,-.5
 set yrange [.5:1]
 set xrange [0:.5]
+
+set yrange [.7:.8]
+set xrange [.2:.3]
+set xtic out nomirror .025
+set ytic out nomirror .05
 show logscale
 
 set grid
-set key 
+unset key 
 
 # plot 'stress-test-small_G.csv' u 1:66:82  w filledcurve fc rgb 'red' fs transparent solid .5 t '80% conf.',\
-#                             '' u 1:63 w l smooth sbezier lc rgb 'red' lw 6 t 'median',\
+#                             '' u 1:63 w l smooth sbezier lc rgb 'red' lw 8 t 'median',\
 #      'stress-test-large_G.csv' u 1:66:82 w filledcurve fc rgb 'blue' fs transparent solid .5  t '80% conf.',\
-#      'stress-test-large_G.csv' u 1:63 w l smooth sbezier lc rgb 'blue' lw 6 t 'median',\
+#      'stress-test-large_G.csv' u 1:63 w l smooth sbezier lc rgb 'blue' lw 8 t 'median',\
 #                             '' u 1:(1-$1) w l lc black t 'available resources'
 
 
+set label at .275,.765 'bussy' center front
 
-plot 'stress-test-small_G.csv' u 1:101 w l smooth sbezier lc rgb '#008b8b'lw 6 t 'small \& dense',\
-     'stress-test-large_G.csv' u 1:101 w l smooth sbezier lc rgb '#ff8c00' lw 6 t 'large \& sparse',\
-     'stress-test-large_G.csv' u 1:2   w l smooth sbezier lc black lw 6 dt 2 t 'available resources'
+plot 'stress-test-small_G.csv' u 1:101 w l smooth sbezier lc rgb '#008b8b'lw 8 t 'small \& dense',\
+     'stress-test-large_G.csv' u 1:101 w l smooth sbezier lc rgb '#ff8c00' lw 8 t 'large \& sparse',\
+     'stress-test-large_G.csv' u 1:(1-$1):(.8) w filledcurves lc 'gray80' fs transparent solid .5
 
 
 
@@ -35,7 +42,7 @@ plot 'stress-test-small_G.csv' u 1:101 w l smooth sbezier lc rgb '#008b8b'lw 6 t
 # delay #
 #########
 reset
-set term pdf
+set term pdf font ",25"
 set out '/tmp/stress-delay.pdf'
 
 
@@ -43,13 +50,13 @@ set out '/tmp/stress-delay.pdf'
 set datafile separator ','
 # Plot smoothed in tables
 set table $SmoothSmall
-    set samples 20
+    set samples 40
     plot 'stress-test-small_G.csv' u 1:81 smooth sbezier
     plot 'stress-test-small_G.csv' u 1:99 smooth sbezier
 unset table
 # Plot smoothed in tables
 set table $SmoothLarge
-    set samples 20
+    set samples 40
     plot 'stress-test-large_G.csv' u 1:81 smooth sbezier
     plot 'stress-test-large_G.csv' u 1:99 smooth sbezier
 unset table
@@ -82,20 +89,24 @@ unset print
 
 # Necessary to use the tables separator
 reset datafile separator
-
+set size ratio .3
 
 set xlabel 'network stress [%]'
-set ylabel 'service delay [ms]'
+set ylabel 'delay [ms]'
+set xtic out nomirror .25
+set ytic out nomirror 10
+set yrange [:30]
 
 set grid
-set key top left
+unset key
 
+set label at .1,15 'limit' center
 
 plot $PasteSmall u 1:2:5 w filledcurves lc rgb 0xcc008b8b ti "small 90% confidence",\
      $PasteLarge u 1:2:5 w filledcurves lc rgb 0xccff8c00 ti "large 90% condifence",\
-     $medianSmall u 1:2 w l smooth sbezier lc '#008b8b' lw 6 t 'small median',\
-     $medianLarge u 1:2 w l smooth sbezier lc '#ff8c00' lw 6 t 'large median',\
-     10 lw 6 dt 2 lc 'black' t 'delay requirement'
+     $medianSmall u 1:2 w l smooth sbezier lc '#008b8b' lw 8 t 'small median',\
+     $medianLarge u 1:2 w l smooth sbezier lc '#ff8c00' lw 8 t 'large median',\
+     10 lw 4 dt 1 lc 'black' t 'delay requirement'
      
     
 
@@ -109,196 +120,290 @@ plot $PasteSmall u 1:2:5 w filledcurves lc rgb 0xcc008b8b ti "small 90% confiden
 # successful migrations #
 #########################
 reset
-set term pdf
+set term pdf font ",25"
+set size ratio .3
 set out '/tmp/stress-migrations.pdf'
 set datafile separator ','
 
 set xlabel 'network stress [%]'
-set ylabel 'successful migrations [%]'
+set ylabel 'migrations [%]' offset 0,-.9
 set yrange [0:1.1]
+set xtic out nomirror .25
+set ytic out nomirror .5
 
 set grid
-set key 
+unset key 
 
-plot 'stress-test-small_G.csv' u 1:77 w l smooth sbezier lc '#008b8b' lw 6 t 'small & dense',\
-     'stress-test-large_G.csv' u 1:77 w l smooth sbezier lc '#ff8c00' lw 6 t 'large & sparse'
-
-
+plot 'stress-test-small_G.csv' u 1:77 w l smooth sbezier lc '#008b8b' lw 8 t 'small & dense',\
+     'stress-test-large_G.csv' u 1:77 w l smooth sbezier lc '#ff8c00' lw 8 t 'large & sparse'
 
 
 
 
-### column: 2 = available_edge
-### column: 3 = available_far_edge
-### column: 4 = available_near_edge
-### column: 5 = completed_10000000
-### column: 6 = delay_10000000
-### column: 7 = free_edge_10000000
-### column: 8 = free_far_edge_10000000
-### column: 9 = free_near_edge_10000000
-### column: 10 = dlmd_runtime_10000000
-### column: 11 = completed_10000001
-### column: 12 = delay_10000001
-### column: 13 = free_edge_10000001
-### column: 14 = free_far_edge_10000001
-### column: 15 = free_near_edge_10000001
-### column: 16 = dlmd_runtime_10000001
-### column: 17 = completed_10000002
-### column: 18 = delay_10000002
-### column: 19 = free_edge_10000002
-### column: 20 = free_far_edge_10000002
-### column: 21 = free_near_edge_10000002
-### column: 22 = dlmd_runtime_10000002
-### column: 23 = completed_10000003
-### column: 24 = delay_10000003
-### column: 25 = free_edge_10000003
-### column: 26 = free_far_edge_10000003
-### column: 27 = free_near_edge_10000003
-### column: 28 = dlmd_runtime_10000003
-### column: 29 = completed_10000004
-### column: 30 = delay_10000004
-### column: 31 = free_edge_10000004
-### column: 32 = free_far_edge_10000004
-### column: 33 = free_near_edge_10000004
-### column: 34 = dlmd_runtime_10000004
-### column: 35 = completed_10000005
-### column: 36 = delay_10000005
-### column: 37 = free_edge_10000005
-### column: 38 = free_far_edge_10000005
-### column: 39 = free_near_edge_10000005
-### column: 40 = dlmd_runtime_10000005
-### column: 41 = completed_10000006
-### column: 42 = delay_10000006
-### column: 43 = free_edge_10000006
-### column: 44 = free_far_edge_10000006
-### column: 45 = free_near_edge_10000006
-### column: 46 = dlmd_runtime_10000006
-### column: 47 = completed_10000007
-### column: 48 = delay_10000007
-### column: 49 = free_edge_10000007
-### column: 50 = free_far_edge_10000007
-### column: 51 = free_near_edge_10000007
-### column: 52 = dlmd_runtime_10000007
-### column: 53 = completed_10000008
-### column: 54 = delay_10000008
-### column: 55 = free_edge_10000008
-### column: 56 = free_far_edge_10000008
-### column: 57 = free_near_edge_10000008
-### column: 58 = dlmd_runtime_10000008
-### column: 59 = completed_10000009
-### column: 60 = delay_10000009
-### column: 61 = free_edge_10000009
-### column: 62 = free_far_edge_10000009
-### column: 63 = free_near_edge_10000009
-### column: 64 = dlmd_runtime_10000009
-### column: 65 = completed_10000010
-### column: 66 = delay_10000010
-### column: 67 = free_edge_10000010
-### column: 68 = free_far_edge_10000010
-### column: 69 = free_near_edge_10000010
-### column: 70 = dlmd_runtime_10000010
-### column: 71 = completed_10000011
-### column: 72 = delay_10000011
-### column: 73 = free_edge_10000011
-### column: 74 = free_far_edge_10000011
-### column: 75 = free_near_edge_10000011
-### column: 76 = dlmd_runtime_10000011
-### column: 77 = completion_percentage
-### column: 78 = delay_avg
-### column: 79 = delay_median
-### column: 80 = delay_percentile_0.00
-### column: 81 = delay_percentile_5.00
-### column: 82 = delay_percentile_10.00
-### column: 83 = delay_percentile_15.00
-### column: 84 = delay_percentile_20.00
-### column: 85 = delay_percentile_25.00
-### column: 86 = delay_percentile_30.00
-### column: 87 = delay_percentile_35.00
-### column: 88 = delay_percentile_40.00
-### column: 89 = delay_percentile_45.00
-### column: 90 = delay_percentile_50.00
-### column: 91 = delay_percentile_55.00
-### column: 92 = delay_percentile_60.00
-### column: 93 = delay_percentile_65.00
-### column: 94 = delay_percentile_70.00
-### column: 95 = delay_percentile_75.00
-### column: 96 = delay_percentile_80.00
-### column: 97 = delay_percentile_85.00
-### column: 98 = delay_percentile_90.00
-### column: 99 = delay_percentile_95.00
-### column: 100 = delay_percentile_100.00
-### column: 101 = free_edge_avg
-### column: 102 = free_edge_median
-### column: 103 = free_edge_min
-### column: 104 = free_edge_percentile_0.00
-### column: 105 = free_edge_percentile_5.00
-### column: 106 = free_edge_percentile_10.00
-### column: 107 = free_edge_percentile_15.00
-### column: 108 = free_edge_percentile_20.00
-### column: 109 = free_edge_percentile_25.00
-### column: 110 = free_edge_percentile_30.00
-### column: 111 = free_edge_percentile_35.00
-### column: 112 = free_edge_percentile_40.00
-### column: 113 = free_edge_percentile_45.00
-### column: 114 = free_edge_percentile_50.00
-### column: 115 = free_edge_percentile_55.00
-### column: 116 = free_edge_percentile_60.00
-### column: 117 = free_edge_percentile_65.00
-### column: 118 = free_edge_percentile_70.00
-### column: 119 = free_edge_percentile_75.00
-### column: 120 = free_edge_percentile_80.00
-### column: 121 = free_edge_percentile_85.00
-### column: 122 = free_edge_percentile_90.00
-### column: 123 = free_edge_percentile_95.00
-### column: 124 = free_edge_percentile_100.00
-### column: 125 = free_far_edge_avg
-### column: 126 = free_far_edge_median
-### column: 127 = free_far_edge_min
-### column: 128 = free_far_edge_percentile_0.00
-### column: 129 = free_far_edge_percentile_5.00
-### column: 130 = free_far_edge_percentile_10.00
-### column: 131 = free_far_edge_percentile_15.00
-### column: 132 = free_far_edge_percentile_20.00
-### column: 133 = free_far_edge_percentile_25.00
-### column: 134 = free_far_edge_percentile_30.00
-### column: 135 = free_far_edge_percentile_35.00
-### column: 136 = free_far_edge_percentile_40.00
-### column: 137 = free_far_edge_percentile_45.00
-### column: 138 = free_far_edge_percentile_50.00
-### column: 139 = free_far_edge_percentile_55.00
-### column: 140 = free_far_edge_percentile_60.00
-### column: 141 = free_far_edge_percentile_65.00
-### column: 142 = free_far_edge_percentile_70.00
-### column: 143 = free_far_edge_percentile_75.00
-### column: 144 = free_far_edge_percentile_80.00
-### column: 145 = free_far_edge_percentile_85.00
-### column: 146 = free_far_edge_percentile_90.00
-### column: 147 = free_far_edge_percentile_95.00
-### column: 148 = free_far_edge_percentile_100.00
-### column: 149 = free_near_edge_avg
-### column: 150 = free_near_edge_median
-### column: 151 = free_near_edge_min
-### column: 152 = free_near_edge_percentile_0.00
-### column: 153 = free_near_edge_percentile_5.00
-### column: 154 = free_near_edge_percentile_10.00
-### column: 155 = free_near_edge_percentile_15.00
-### column: 156 = free_near_edge_percentile_20.00
-### column: 157 = free_near_edge_percentile_25.00
-### column: 158 = free_near_edge_percentile_30.00
-### column: 159 = free_near_edge_percentile_35.00
-### column: 160 = free_near_edge_percentile_40.00
-### column: 161 = free_near_edge_percentile_45.00
-### column: 162 = free_near_edge_percentile_50.00
-### column: 163 = free_near_edge_percentile_55.00
-### column: 164 = free_near_edge_percentile_60.00
-### column: 165 = free_near_edge_percentile_65.00
-### column: 166 = free_near_edge_percentile_70.00
-### column: 167 = free_near_edge_percentile_75.00
-### column: 168 = free_near_edge_percentile_80.00
-### column: 169 = free_near_edge_percentile_85.00
-### column: 170 = free_near_edge_percentile_90.00
-### column: 171 = free_near_edge_percentile_95.00
-### column: 172 = free_near_edge_percentile_100.00
-### column: 173 = max_dlmd_runtime
+###########
+# runtime #
+###########
+reset
+set term pdf font ",25"
+set out '/tmp/stress-runtime.pdf'
+
+
+
+set datafile separator ','
+# Plot smoothed in tables
+set table $SmoothSmall
+    set samples 40
+    plot 'stress-test-small_G.csv' u 1:179 smooth sbezier
+    plot 'stress-test-small_G.csv' u 1:192 smooth sbezier
+unset table
+# Plot smoothed in tables
+set table $SmoothLarge
+    set samples 40
+    plot 'stress-test-large_G.csv' u 1:179 smooth sbezier
+    plot 'stress-test-large_G.csv' u 1:192 smooth sbezier
+unset table
+
+
+# Create the table for the small/large median points
+set table $medianSmall
+    plot 'stress-test-small_G.csv' u 1:194
+unset table
+set table $medianLarge
+    plot 'stress-test-large_G.csv' u 1:194
+unset table
+
+
+# Merge the down+up curves
+set print $PasteSmall
+    N = |$SmoothSmall|
+    do for [i=1:N/2] {
+        print $SmoothSmall[i].$SmoothSmall[i+N/2]
+    }
+unset print
+#
+set print $PasteLarge
+    N = |$SmoothLarge|
+    do for [i=1:N/2] {
+        print $SmoothLarge[i].$SmoothLarge[i+N/2]
+    }
+unset print
+
+
+# Necessary to use the tables separator
+reset datafile separator
+set size ratio .3
+
+
+set xlabel 'network stress [%]'
+set ylabel 'runtime [ms]' offset 0,-.5
+
+set grid
+unset key 
+set yrange [0:30]
+set xtic out nomirror .25
+set ytic out nomirror 10
+
+
+plot $PasteSmall u 1:(1000*$2):(1000*$5) w filledcurves lc rgb 0xcc008b8b ti "small 90% confidence",\
+     $PasteLarge u 1:(1000*$2):(1000*$5) w filledcurves lc rgb 0xccff8c00 ti "large 90% condifence",\
+     $medianSmall u 1:(1000*$2) w l smooth sbezier lc '#008b8b' lw 8 t 'small median',\
+     $medianLarge u 1:(1000*$2) w l smooth sbezier lc '#ff8c00' lw 8 t 'large median'
+
+
+
+## column: 2 = available_edge
+## column: 3 = available_far_edge
+## column: 4 = available_near_edge
+## column: 5 = completed_10000000
+## column: 6 = delay_10000000
+## column: 7 = free_edge_10000000
+## column: 8 = free_far_edge_10000000
+## column: 9 = free_near_edge_10000000
+## column: 10 = dlmd_runtime_10000000
+## column: 11 = completed_10000001
+## column: 12 = delay_10000001
+## column: 13 = free_edge_10000001
+## column: 14 = free_far_edge_10000001
+## column: 15 = free_near_edge_10000001
+## column: 16 = dlmd_runtime_10000001
+## column: 17 = completed_10000002
+## column: 18 = delay_10000002
+## column: 19 = free_edge_10000002
+## column: 20 = free_far_edge_10000002
+## column: 21 = free_near_edge_10000002
+## column: 22 = dlmd_runtime_10000002
+## column: 23 = completed_10000003
+## column: 24 = delay_10000003
+## column: 25 = free_edge_10000003
+## column: 26 = free_far_edge_10000003
+## column: 27 = free_near_edge_10000003
+## column: 28 = dlmd_runtime_10000003
+## column: 29 = completed_10000004
+## column: 30 = delay_10000004
+## column: 31 = free_edge_10000004
+## column: 32 = free_far_edge_10000004
+## column: 33 = free_near_edge_10000004
+## column: 34 = dlmd_runtime_10000004
+## column: 35 = completed_10000005
+## column: 36 = delay_10000005
+## column: 37 = free_edge_10000005
+## column: 38 = free_far_edge_10000005
+## column: 39 = free_near_edge_10000005
+## column: 40 = dlmd_runtime_10000005
+## column: 41 = completed_10000006
+## column: 42 = delay_10000006
+## column: 43 = free_edge_10000006
+## column: 44 = free_far_edge_10000006
+## column: 45 = free_near_edge_10000006
+## column: 46 = dlmd_runtime_10000006
+## column: 47 = completed_10000007
+## column: 48 = delay_10000007
+## column: 49 = free_edge_10000007
+## column: 50 = free_far_edge_10000007
+## column: 51 = free_near_edge_10000007
+## column: 52 = dlmd_runtime_10000007
+## column: 53 = completed_10000008
+## column: 54 = delay_10000008
+## column: 55 = free_edge_10000008
+## column: 56 = free_far_edge_10000008
+## column: 57 = free_near_edge_10000008
+## column: 58 = dlmd_runtime_10000008
+## column: 59 = completed_10000009
+## column: 60 = delay_10000009
+## column: 61 = free_edge_10000009
+## column: 62 = free_far_edge_10000009
+## column: 63 = free_near_edge_10000009
+## column: 64 = dlmd_runtime_10000009
+## column: 65 = completed_10000010
+## column: 66 = delay_10000010
+## column: 67 = free_edge_10000010
+## column: 68 = free_far_edge_10000010
+## column: 69 = free_near_edge_10000010
+## column: 70 = dlmd_runtime_10000010
+## column: 71 = completed_10000011
+## column: 72 = delay_10000011
+## column: 73 = free_edge_10000011
+## column: 74 = free_far_edge_10000011
+## column: 75 = free_near_edge_10000011
+## column: 76 = dlmd_runtime_10000011
+## column: 77 = completion_percentage
+## column: 78 = delay_avg
+## column: 79 = delay_median
+## column: 80 = delay_percentile_0.00
+## column: 81 = delay_percentile_5.00
+## column: 82 = delay_percentile_10.00
+## column: 83 = delay_percentile_15.00
+## column: 84 = delay_percentile_20.00
+## column: 85 = delay_percentile_25.00
+## column: 86 = delay_percentile_30.00
+## column: 87 = delay_percentile_35.00
+## column: 88 = delay_percentile_40.00
+## column: 89 = delay_percentile_45.00
+## column: 90 = delay_percentile_50.00
+## column: 91 = delay_percentile_55.00
+## column: 92 = delay_percentile_60.00
+## column: 93 = delay_percentile_65.00
+## column: 94 = delay_percentile_70.00
+## column: 95 = delay_percentile_75.00
+## column: 96 = delay_percentile_80.00
+## column: 97 = delay_percentile_85.00
+## column: 98 = delay_percentile_90.00
+## column: 99 = delay_percentile_95.00
+## column: 100 = delay_percentile_100.00
+## column: 101 = free_edge_avg
+## column: 102 = free_edge_median
+## column: 103 = free_edge_min
+## column: 104 = free_edge_percentile_0.00
+## column: 105 = free_edge_percentile_5.00
+## column: 106 = free_edge_percentile_10.00
+## column: 107 = free_edge_percentile_15.00
+## column: 108 = free_edge_percentile_20.00
+## column: 109 = free_edge_percentile_25.00
+## column: 110 = free_edge_percentile_30.00
+## column: 111 = free_edge_percentile_35.00
+## column: 112 = free_edge_percentile_40.00
+## column: 113 = free_edge_percentile_45.00
+## column: 114 = free_edge_percentile_50.00
+## column: 115 = free_edge_percentile_55.00
+## column: 116 = free_edge_percentile_60.00
+## column: 117 = free_edge_percentile_65.00
+## column: 118 = free_edge_percentile_70.00
+## column: 119 = free_edge_percentile_75.00
+## column: 120 = free_edge_percentile_80.00
+## column: 121 = free_edge_percentile_85.00
+## column: 122 = free_edge_percentile_90.00
+## column: 123 = free_edge_percentile_95.00
+## column: 124 = free_edge_percentile_100.00
+## column: 125 = free_far_edge_avg
+## column: 126 = free_far_edge_median
+## column: 127 = free_far_edge_min
+## column: 128 = free_far_edge_percentile_0.00
+## column: 129 = free_far_edge_percentile_5.00
+## column: 130 = free_far_edge_percentile_10.00
+## column: 131 = free_far_edge_percentile_15.00
+## column: 132 = free_far_edge_percentile_20.00
+## column: 133 = free_far_edge_percentile_25.00
+## column: 134 = free_far_edge_percentile_30.00
+## column: 135 = free_far_edge_percentile_35.00
+## column: 136 = free_far_edge_percentile_40.00
+## column: 137 = free_far_edge_percentile_45.00
+## column: 138 = free_far_edge_percentile_50.00
+## column: 139 = free_far_edge_percentile_55.00
+## column: 140 = free_far_edge_percentile_60.00
+## column: 141 = free_far_edge_percentile_65.00
+## column: 142 = free_far_edge_percentile_70.00
+## column: 143 = free_far_edge_percentile_75.00
+## column: 144 = free_far_edge_percentile_80.00
+## column: 145 = free_far_edge_percentile_85.00
+## column: 146 = free_far_edge_percentile_90.00
+## column: 147 = free_far_edge_percentile_95.00
+## column: 148 = free_far_edge_percentile_100.00
+## column: 149 = free_near_edge_avg
+## column: 150 = free_near_edge_median
+## column: 151 = free_near_edge_min
+## column: 152 = free_near_edge_percentile_0.00
+## column: 153 = free_near_edge_percentile_5.00
+## column: 154 = free_near_edge_percentile_10.00
+## column: 155 = free_near_edge_percentile_15.00
+## column: 156 = free_near_edge_percentile_20.00
+## column: 157 = free_near_edge_percentile_25.00
+## column: 158 = free_near_edge_percentile_30.00
+## column: 159 = free_near_edge_percentile_35.00
+## column: 160 = free_near_edge_percentile_40.00
+## column: 161 = free_near_edge_percentile_45.00
+## column: 162 = free_near_edge_percentile_50.00
+## column: 163 = free_near_edge_percentile_55.00
+## column: 164 = free_near_edge_percentile_60.00
+## column: 165 = free_near_edge_percentile_65.00
+## column: 166 = free_near_edge_percentile_70.00
+## column: 167 = free_near_edge_percentile_75.00
+## column: 168 = free_near_edge_percentile_80.00
+## column: 169 = free_near_edge_percentile_85.00
+## column: 170 = free_near_edge_percentile_90.00
+## column: 171 = free_near_edge_percentile_95.00
+## column: 172 = free_near_edge_percentile_100.00
+## column: 173 = dlmd_runtime_percentile_0.00
+## column: 174 = dlmd_runtime_percentile_5.00
+## column: 175 = dlmd_runtime_percentile_10.00
+## column: 176 = dlmd_runtime_percentile_15.00
+## column: 177 = dlmd_runtime_percentile_20.00
+## column: 178 = dlmd_runtime_percentile_25.00
+## column: 179 = dlmd_runtime_percentile_30.00
+## column: 180 = dlmd_runtime_percentile_35.00
+## column: 181 = dlmd_runtime_percentile_40.00
+## column: 182 = dlmd_runtime_percentile_45.00
+## column: 183 = dlmd_runtime_percentile_50.00
+## column: 184 = dlmd_runtime_percentile_55.00
+## column: 185 = dlmd_runtime_percentile_60.00
+## column: 186 = dlmd_runtime_percentile_65.00
+## column: 187 = dlmd_runtime_percentile_70.00
+## column: 188 = dlmd_runtime_percentile_75.00
+## column: 189 = dlmd_runtime_percentile_80.00
+## column: 190 = dlmd_runtime_percentile_85.00
+## column: 191 = dlmd_runtime_percentile_90.00
+## column: 192 = dlmd_runtime_percentile_95.00
+## column: 193 = dlmd_runtime_percentile_100.00
+## column: 194 = median_dlmd_runtime
+## column: 195 = max_dlmd_runtime
 
 
