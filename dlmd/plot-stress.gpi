@@ -28,7 +28,8 @@ unset key
 #                             '' u 1:(1-$1) w l lc black t 'available resources'
 
 
-set label at .275,.765 'bussy' center front
+set label at 27.5,76.5 'bussy' center front
+
 
 plot 'stress-test-small_G.csv' u ($1*100):($101*100) w l smooth sbezier lc rgb '#008b8b'lw 8 t 'small \& dense',\
      'stress-test-large_G.csv' u ($1*100):($101*100) w l smooth sbezier lc rgb '#ff8c00' lw 8 t 'large \& sparse',\
