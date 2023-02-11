@@ -9,13 +9,13 @@ set datafile separator ','
 
 set xlabel 'network stress [%]'
 set ylabel 'free Edge [%]' offset 1,-.5
-set yrange [.5:1]
-set xrange [0:.5]
+set yrange [50:100]
+set xrange [0:50]
 
-set yrange [.7:.8]
-set xrange [.2:.3]
-set xtic out nomirror .025
-set ytic out nomirror .05
+set yrange [70:80]
+set xrange [20:30]
+set xtic out nomirror 2.5
+set ytic out nomirror 5
 show logscale
 
 set grid
@@ -30,9 +30,9 @@ unset key
 
 set label at .275,.765 'bussy' center front
 
-plot 'stress-test-small_G.csv' u 1:101 w l smooth sbezier lc rgb '#008b8b'lw 8 t 'small \& dense',\
-     'stress-test-large_G.csv' u 1:101 w l smooth sbezier lc rgb '#ff8c00' lw 8 t 'large \& sparse',\
-     'stress-test-large_G.csv' u 1:(1-$1):(.8) w filledcurves lc 'gray80' fs transparent solid .5
+plot 'stress-test-small_G.csv' u ($1*100):($101*100) w l smooth sbezier lc rgb '#008b8b'lw 8 t 'small \& dense',\
+     'stress-test-large_G.csv' u ($1*100):($101*100) w l smooth sbezier lc rgb '#ff8c00' lw 8 t 'large \& sparse',\
+     'stress-test-large_G.csv' u ($1*100):((1-$1)*100):(80) w filledcurves lc 'gray80' fs transparent solid .5
 
 
 
@@ -51,23 +51,23 @@ set datafile separator ','
 # Plot smoothed in tables
 set table $SmoothSmall
     set samples 40
-    plot 'stress-test-small_G.csv' u 1:81 smooth sbezier
-    plot 'stress-test-small_G.csv' u 1:99 smooth sbezier
+    plot 'stress-test-small_G.csv' u ($1*100):81 smooth sbezier
+    plot 'stress-test-small_G.csv' u ($1*100):81 smooth sbezier
 unset table
 # Plot smoothed in tables
 set table $SmoothLarge
     set samples 40
-    plot 'stress-test-large_G.csv' u 1:81 smooth sbezier
-    plot 'stress-test-large_G.csv' u 1:99 smooth sbezier
+    plot 'stress-test-large_G.csv' u ($1*100):81 smooth sbezier
+    plot 'stress-test-large_G.csv' u ($1*100):81 smooth sbezier
 unset table
 
 
 # Create the table for the small/large median points
 set table $medianSmall
-    plot 'stress-test-small_G.csv' u 1:79
+    plot 'stress-test-small_G.csv' u ($1*100):79
 unset table
 set table $medianLarge
-    plot 'stress-test-large_G.csv' u 1:79
+    plot 'stress-test-large_G.csv' u ($1*100):79
 unset table
 
 
@@ -93,20 +93,20 @@ set size ratio .3
 
 set xlabel 'network stress [%]'
 set ylabel 'delay [ms]'
-set xtic out nomirror .25
+set xtic out nomirror 25
 set ytic out nomirror 10
 set yrange [:30]
 
 set grid
 unset key
 
-set label at .1,15 'limit' center
+set label at 10,19 'limit' center
 
 plot $PasteSmall u 1:2:5 w filledcurves lc rgb 0xcc008b8b ti "small 90% confidence",\
      $PasteLarge u 1:2:5 w filledcurves lc rgb 0xccff8c00 ti "large 90% condifence",\
      $medianSmall u 1:2 w l smooth sbezier lc '#008b8b' lw 8 t 'small median',\
      $medianLarge u 1:2 w l smooth sbezier lc '#ff8c00' lw 8 t 'large median',\
-     10 lw 4 dt 1 lc 'black' t 'delay requirement'
+     15 lw 4 dt 1 lc 'black' t 'delay requirement'
      
     
 
@@ -127,15 +127,15 @@ set datafile separator ','
 
 set xlabel 'network stress [%]'
 set ylabel 'migrations [%]' offset 0,-.9
-set yrange [0:1.1]
-set xtic out nomirror .25
-set ytic out nomirror .5
+set yrange [0:110]
+set xtic out nomirror 25
+set ytic out nomirror 50
 
 set grid
 unset key 
 
-plot 'stress-test-small_G.csv' u 1:77 w l smooth sbezier lc '#008b8b' lw 8 t 'small & dense',\
-     'stress-test-large_G.csv' u 1:77 w l smooth sbezier lc '#ff8c00' lw 8 t 'large & sparse'
+plot 'stress-test-small_G.csv' u ($1*100):($77*100) w l smooth sbezier lc '#008b8b' lw 8 t 'small & dense',\
+     'stress-test-large_G.csv' u ($1*100):($77*100) w l smooth sbezier lc '#ff8c00' lw 8 t 'large & sparse'
 
 
 
@@ -153,23 +153,23 @@ set datafile separator ','
 # Plot smoothed in tables
 set table $SmoothSmall
     set samples 40
-    plot 'stress-test-small_G.csv' u 1:179 smooth sbezier
-    plot 'stress-test-small_G.csv' u 1:192 smooth sbezier
+    plot 'stress-test-small_G.csv' u ($1*100):179 smooth sbezier
+    plot 'stress-test-small_G.csv' u ($1*100):192 smooth sbezier
 unset table
 # Plot smoothed in tables
 set table $SmoothLarge
     set samples 40
-    plot 'stress-test-large_G.csv' u 1:179 smooth sbezier
-    plot 'stress-test-large_G.csv' u 1:192 smooth sbezier
+    plot 'stress-test-large_G.csv' u ($1*100):179 smooth sbezier
+    plot 'stress-test-large_G.csv' u ($1*100):192 smooth sbezier
 unset table
 
 
 # Create the table for the small/large median points
 set table $medianSmall
-    plot 'stress-test-small_G.csv' u 1:194
+    plot 'stress-test-small_G.csv' u ($1*100):194
 unset table
 set table $medianLarge
-    plot 'stress-test-large_G.csv' u 1:194
+    plot 'stress-test-large_G.csv' u ($1*100):194
 unset table
 
 
@@ -200,7 +200,7 @@ set ylabel 'runtime [ms]' offset 0,-.5
 set grid
 unset key 
 set yrange [0:30]
-set xtic out nomirror .25
+set xtic out nomirror 25
 set ytic out nomirror 10
 
 
