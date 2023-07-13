@@ -82,10 +82,10 @@ subject to capacity{n in N}:
 subject to throughput{(n1,n2) in E}:
          sum{si in S}sum {(v1, v2) in VL[si]} avl[si,v1,v2,n1,n2]*vf_throughput[si, v1,v2] <=lambda[n1,n2];
          
-subject to PoA_feasiblity{i in r, p in R}:
+subject to PoA_feasiblity{i in r, p in R}:                                      #in case of ignoring signal constraint 12, 13   we get fig 3d 
        sum{si in S}sum {(v1,v2) in VL[si]} vf_throughput[si, v1,v2]<= T[i,p];
        
-subject to delay{Si in S}:
+subject to delay{Si in S}:                                                          #in case of ignoring delay information we get fig 3C
          sum {v in VNF[Si]} Pdelay[Si,v] +
          sum {(v1,v2) in VL[Si]} sum {(n1,n2) in E}
              (avl[Si,v1,v2,n1,n2]*d[n1,n2]+qd[n1,n2]) <=DS[Si];
