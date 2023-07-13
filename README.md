@@ -1,2 +1,2 @@
 # COTORRA
-Optimization Modeal for Resource Allocation
+Optimization Model for Resource Allocation
